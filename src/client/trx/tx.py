@@ -6,6 +6,7 @@ from gi.repository import Gst, GLib
 Gst.init(None)
 
 import time
+import sys
 
 class RTPTransmitter(object):
 
@@ -213,8 +214,8 @@ if __name__ == '__main__':
 
     class Config(object):
         def __init__(self):
-            self.receiver_host = '192.168.2.6'
-            self.port = 51350
+            self.receiver_host = sys.argv[1]
+            self.port = int(sys.argv[2])
 
             self.encoding = 'opus'
             self.bitrate = 128

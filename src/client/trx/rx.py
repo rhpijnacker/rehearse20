@@ -5,6 +5,8 @@ gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GLib
 Gst.init(None)
 
+import sys
+
 class RTPReceiver(object):
 
     def __init__(self, link_config, audio_interface):
@@ -217,8 +219,8 @@ if __name__ == '__main__':
     class Config(object):
         def __init__(self):
             self.encoding = 'opus'
-            self.receiver_host = '192.168.2.6'
-            self.port = 51350
+            self.receiver_host = sys.argv[1]
+            self.port = int(sys.argv[2])
             self.jitter_buffer = 4 # 40 ms
 #            self.caps = 'application/x-rtp, media=(string)audio, clock-rate=(int)48000, encoding-name=(string)OPUS, sprop-maxcapturerate=(string)48000, sprop-stereo=(string)0, payload=(int)96, encoding-params=(string)2'
             self.caps = 'application/x-rtp, media=(string)audio, clock-rate=(int)48000, encoding-name=(string)OPUS, sprop-stereo=(string)0'

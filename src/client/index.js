@@ -1,3 +1,4 @@
+const child_process = require('child_process');
 const io = require('socket.io-client');
 const stun = require('stun');
 
@@ -5,6 +6,8 @@ const getExternalPort = async () => {
   const STUN_SERVER = 'stun.l.google.com:19302';
   const result = await stun.request(STUN_SERVER);
   const xorAddress = result.getXorAddress();
+  console.log(result);
+  xorAddress.address = '127.0.0.1';
   return { address: xorAddress.address, port: xorAddress.port };
 };
 
@@ -31,6 +34,19 @@ socket.on('start receiving', async ({ id, address }, callback) => {
   console.log(
     `starting to recv from ${id} at ${address} on ${external.address}:${external.port}`
   );
+  console.log('python3', [
+    `${__dirname}/trx/rx.py`,
+    external.address,
+    external.port,
+  ]);
+  const child = child_process.spawn('python3', [
+    `${__dirname}/trx/rx.py`,
+    external.address,
+    external.port,
+  ]);
+  child.on('close', (code) => {
+    console.log(`rx.py exited with code ${code}`);
+  });
 });
 
 socket.on('stop receiving', ({ id, address }) => {
@@ -39,6 +55,15 @@ socket.on('stop receiving', ({ id, address }) => {
 
 socket.on('start sending', ({ id, address, port }) => {
   console.log(`starting to send to ${id} on ${address}:${port}`);
+  console.log('python3', [`${__dirname}/trx/tx.py`, address, port]);
+  const child = child_process.spawn('python3', [
+    `${__dirname}/trx/tx.py`,
+    address,
+    port,
+  ]);
+  child.on('close', (code) => {
+    console.log(`tx.py exited with code ${code}`);
+  });
 });
 
 socket.on('stop sending', ({ id, address }) => {
