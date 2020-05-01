@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
     console.log(`#${sockets.length} left`);
     sockets.forEach((s) => {
       s.socket.emit('chat message', `${disconnected.name} left`);
-      s.socket.emit('stop streaming', {
+      s.socket.emit('stop sending', {
         name: disconnected.name,
         address: disconnected.address,
       });
@@ -51,15 +51,15 @@ io.on('connection', (socket) => {
     sockets
       .filter((s) => s.socket !== socket) // not to myself
       .forEach((other) => {
-        socket.emit('request connection', ({ address, port }) => {
-          other.socket.emit('start streaming', {
+        socket.emit('start receiving', ({ address, port }) => {
+          other.socket.emit('start sending', {
             name: me.name,
             address,
             port,
           });
         });
-        other.socket.emit('request connection', ({ address, port }) => {
-          socket.emit('start streaming', { name: other.name, address, port });
+        other.socket.emit('start receiving', ({ address, port }) => {
+          socket.emit('start sending', { name: other.name, address, port });
         });
       });
   });
