@@ -5,6 +5,7 @@
     "stun": "^2.1.0"
   },
   "devDependencies": {
+    "electron": "^8.2.5",
     "prettier": "^2.0.5"
   }
 }
