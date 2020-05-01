@@ -7,5 +7,8 @@
   "devDependencies": {
     "electron": "^8.2.5",
     "prettier": "^2.0.5"
+  },
+  "scripts": {
+    "start": "electron src/client"
   }
 }
