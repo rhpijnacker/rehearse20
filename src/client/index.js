@@ -1,28 +1,38 @@
 const io = require('socket.io-client');
 const stun = require('stun');
 
-const name = process.argv[2] || 'John Doe';
+const getExternalPort = async () => {
+  const STUN_SERVER = 'stun.l.google.com:19302';
+  const result = await stun.request(STUN_SERVER);
+  const xorAddress = result.getXorAddress();
+  return { address: xorAddress.address, port: xorAddress.port };
+};
 
+const name = process.argv[2] || 'John Doe';
 const socket = io(`http://localhost:3000`);
+
+socket.on('connect', async () => {
+  console.log('connected');
+  const { address } = await getExternalPort();
+  socket.emit('identify', { name, address }, () => {
+    socket.emit('start streaming');
+  });
+});
+
+socket.on('disconnect', () => {
+  console.log('disconnected');
+});
 
 socket.on('chat message', (msg) => console.log('message:', msg));
 
-(async () => {
-  const result = await stun.request('stun.l.google.com:19302');
-  const xorAddress = result.getXorAddress();
-  socket.emit('identify', { name, address: xorAddress.address }, () => {
-    socket.emit('start streaming');
-  });
-})();
-
-socket.on('start receiving', async ({ id, address }, callback) => {
-  const result = await stun.request('stun.l.google.com:19302');
-  const xorAddress = result.getXorAddress();
-  callback({ address: xorAddress.address, port: xorAddress.port });
+socket.on('start receiving', async ({ id, srcAddress }, callback) => {
+  const { address, port } = await getExternalPort();
+  callback({ address, port });
   console.log(
-    `starting to recv from ${id} at ${address} on ${xorAddress.address}:${xorAddress.port}`
+    `starting to recv from ${id} at ${srcAddress} on ${address}:${port}`
   );
 });
+
 socket.on('stop receiving', ({ id, address }) => {
   console.log(`stop recving from ${id} at ${address}`);
 });
@@ -30,6 +40,7 @@ socket.on('stop receiving', ({ id, address }) => {
 socket.on('start sending', ({ id, address, port }) => {
   console.log(`starting to send to ${id} on ${address}:${port}`);
 });
+
 socket.on('stop sending', ({ id, address }) => {
   console.log(`stop sending to ${id} on ${address}`);
 });
