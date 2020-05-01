@@ -19,16 +19,21 @@ let sockets = [];
 io.on('connection', (socket) => {
   console.log('socket connected');
 
+  const self = { id: socket.id, socket };
+  console.log(self);
+
   socket.on('disconnect', () => {
-    const disconnected = sockets.filter((s) => s.socket === socket)[0];
-    sockets = sockets.filter((s) => s.socket !== socket);
-    console.log(`disconnected ${disconnected.name}`);
+    sockets = sockets.filter((s) => s.socket !== self.socket);
+    console.log(`disconnected ${self.name}`);
     console.log(`#${sockets.length} left`);
     sockets.forEach((s) => {
-      s.socket.emit('chat message', `${disconnected.name} left`);
+      s.socket.emit('chat message', `${self.name} left`);
       s.socket.emit('stop sending', {
-        name: disconnected.name,
-        address: disconnected.address,
+        name: self.name,
+        address: self.address,
+      });
+      s.socket.emit('stop receiving', {
+        address: self.address,
       });
     });
   });
@@ -36,7 +41,9 @@ io.on('connection', (socket) => {
   socket.on('identify', ({ name, address }, callback) => {
     console.log(`identified ${name} on ${address}`);
     sockets.forEach((s) => s.socket.emit('chat mesage', `${name} joined`));
-    sockets.push({ name, address, socket });
+    self.address = address;
+    self.name = name;
+    sockets.push(self);
     console.log(`#${sockets.length} connected`);
     callback();
   });
@@ -47,19 +54,22 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start streaming', () => {
-    const me = sockets.filter((s) => s.socket === socket)[0];
     sockets
-      .filter((s) => s.socket !== socket) // not to myself
+      .filter((s) => s.socket !== self.socket) // not to myself
       .forEach((other) => {
-        socket.emit('start receiving', ({ address, port }) => {
+        self.socket.emit('start receiving', ({ address, port }) => {
           other.socket.emit('start sending', {
-            name: me.name,
+            name: self.name,
             address,
             port,
           });
         });
         other.socket.emit('start receiving', ({ address, port }) => {
-          socket.emit('start sending', { name: other.name, address, port });
+          self.socket.emit('start sending', {
+            name: other.name,
+            address,
+            port,
+          });
         });
       });
   });
