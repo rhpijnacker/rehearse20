@@ -25,11 +25,11 @@ socket.on('disconnect', () => {
 
 socket.on('chat message', (msg) => console.log('message:', msg));
 
-socket.on('start receiving', async ({ id, srcAddress }, callback) => {
-  const { address, port } = await getExternalPort();
-  callback({ address, port });
+socket.on('start receiving', async ({ id, address }, callback) => {
+  const external = await getExternalPort();
+  callback(external);
   console.log(
-    `starting to recv from ${id} at ${srcAddress} on ${address}:${port}`
+    `starting to recv from ${id} at ${address} on ${external.address}:${external.port}`
   );
 });
 
