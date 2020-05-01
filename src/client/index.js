@@ -15,19 +15,21 @@ socket.on('chat message', (msg) => console.log('message:', msg));
   });
 })();
 
-socket.on('start receiving', async (callback) => {
+socket.on('start receiving', async ({ id, address }, callback) => {
   const result = await stun.request('stun.l.google.com:19302');
   const xorAddress = result.getXorAddress();
   callback({ address: xorAddress.address, port: xorAddress.port });
-  console.log(`starting to receive on ${xorAddress.address}:${xorAddress.port}`);
+  console.log(
+    `starting to recv from ${id} at ${address} on ${xorAddress.address}:${xorAddress.port}`
+  );
 });
-socket.on('stop receiving', ({ address }) => {
-  console.log(`stop receiving from ${address}`);
+socket.on('stop receiving', ({ id, address }) => {
+  console.log(`stop recving from ${id} at ${address}`);
 });
 
-socket.on('start sending', ({ name, address, port }) => {
-  console.log(`starting stream to ${name} on ${address}:${port}`);
+socket.on('start sending', ({ id, address, port }) => {
+  console.log(`starting to send to ${id} on ${address}:${port}`);
 });
-socket.on('stop sending', ({ name, address }) => {
-  console.log(`stop streaming to ${name} on ${address}`);
+socket.on('stop sending', ({ id, address }) => {
+  console.log(`stop sending to ${id} on ${address}`);
 });

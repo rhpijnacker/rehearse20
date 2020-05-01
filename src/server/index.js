@@ -20,7 +20,6 @@ io.on('connection', (socket) => {
   console.log('socket connected');
 
   const self = { id: socket.id, socket };
-  console.log(self);
 
   socket.on('disconnect', () => {
     sockets = sockets.filter((s) => s.socket !== self.socket);
@@ -29,10 +28,12 @@ io.on('connection', (socket) => {
     sockets.forEach((s) => {
       s.socket.emit('chat message', `${self.name} left`);
       s.socket.emit('stop sending', {
+        id: self.id,
         name: self.name,
         address: self.address,
       });
       s.socket.emit('stop receiving', {
+        id: self.id,
         address: self.address,
       });
     });
@@ -57,20 +58,30 @@ io.on('connection', (socket) => {
     sockets
       .filter((s) => s.socket !== self.socket) // not to myself
       .forEach((other) => {
-        self.socket.emit('start receiving', ({ address, port }) => {
-          other.socket.emit('start sending', {
-            name: self.name,
-            address,
-            port,
-          });
-        });
-        other.socket.emit('start receiving', ({ address, port }) => {
-          self.socket.emit('start sending', {
-            name: other.name,
-            address,
-            port,
-          });
-        });
+        self.socket.emit(
+          'start receiving',
+          { id: other.id, address: other.address },
+          ({ address, port }) => {
+            other.socket.emit('start sending', {
+              id: self.id,
+              name: self.name,
+              address,
+              port,
+            });
+          }
+        );
+        other.socket.emit(
+          'start receiving',
+          { id: self.id, address: self.address },
+          ({ address, port }) => {
+            self.socket.emit('start sending', {
+              id: other.id,
+              name: other.name,
+              address,
+              port,
+            });
+          }
+        );
       });
   });
 });
