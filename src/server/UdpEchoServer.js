@@ -21,7 +21,7 @@ class UdpEchoServer {
   echoBack(message, remote) {
     console.log('Data received from client : ' + message.toString());
     this.socket.send(
-      new Buffer(`udp://${remote.address}:${remote.port}`),
+      Buffer.from(`udp://${remote.address}:${remote.port}`),
       remote.port,
       remote.address,
       (error) => {
