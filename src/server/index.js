@@ -1,14 +1,14 @@
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
+const UdpEchoServer = require('./UdpEchoServer');
+
+const echoServer = new UdpEchoServer();
+echoServer.listen(50051);
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
-
-app.get('/', (req, res) => {
-  res.sendFile(`${__dirname}/index.html`);
-});
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
