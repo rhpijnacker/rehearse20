@@ -19,7 +19,7 @@ class UdpEchoServer {
   }
 
   echoBack(message, remote) {
-    console.log(`Echo request received from ${remote.address}:${remote.port}: ${messagage.toString()}`;
+    console.log(`Echo request received from ${remote.address}:${remote.port}: ${messagage.toString()}`);
     this.socket.send(
       Buffer.from(`udp://${remote.address}:${remote.port}`),
       remote.port,
