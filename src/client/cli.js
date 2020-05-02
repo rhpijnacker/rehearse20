@@ -12,7 +12,7 @@ const getExternalPort = async () => {
 };
 
 const name = process.argv[2] || 'John Doe';
-const socket = io(`http://localhost:3000`);
+const socket = io(`http://rehearse20.sijben.dev:3000`);
 
 socket.on('connect', async () => {
   console.log('connected');

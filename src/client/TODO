@@ -1,0 +1,4 @@
+- Manage the forked processes
+- Refactor the client socket-io code
+- Use a proper client framework such as React
+- Add some styling
