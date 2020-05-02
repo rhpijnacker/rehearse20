@@ -5,9 +5,8 @@ class UdpEchoServer {
     this.socket = dgram.createSocket('udp4');
 
     this.socket.on('listening', () => {
-      const address = this.socket.address();
-      const port = this.socket.port();
-      console.log(`Listening on ${address}:${port}`);
+      const props = this.socket.address();
+      console.log(`Listening on ${props.address}:${props.port}`);
     });
 
     this.socket.on('message', (message, remote) =>
