@@ -17,6 +17,9 @@ class UdpEchoClient {
         // message should be: url://<hostname>:<port>
         const externalProps = url.parse(message.toString());
         resolve({ address: externalProps.hostname, port: externalProps.port });
+        console.log(
+          `Punched hole from to ${externalProps.hostname}:${externalProps.port}`
+        );
         socket.close();
       });
 
