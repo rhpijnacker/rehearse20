@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "electron": "^8.2.5",
+    "jest": "^25.5.4",
     "prettier": "^2.0.5"
   },
   "scripts": {
