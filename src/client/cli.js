@@ -1,8 +1,10 @@
 const child_process = require('child_process');
 const io = require('socket.io-client');
 const UdpEchoClient = require('./UdpEchoClient');
+const TrxStreamer = require('./TrxStreamer');
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
+const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
 
 const name = process.argv[2] || 'John Doe';
 const startPort = parseInt(process.argv[3] || 51350, 10);
@@ -34,67 +36,8 @@ const getFreePort = async () => {
   }
 };
 
-const socket = io(`http://rehearse20.sijben.dev:3000`);
-
-// { <id>: { rx: <ChildProcess>, tx: <ChildProcess> }, ... }
-let streamers = {};
-
-const cleanup = () => {
-  const ids = Object.keys(streamers).filter((id) => {
-    const streams = streamers[id];
-    return streams.rx || streams.tx;
-  });
-  streamers = ids.reduce((accum, id) => {
-    accum[id] = streamers[id];
-    return accum;
-  }, {});
-};
-
-let rx, tx;
-const streamingTech = 'trx';
-if (streamingTech === 'trx') {
-  rx = (address, port) => {
-    console.log(`${__dirname}/trx/rx`, ['-m', 2, '-j', 4, '-p', port]);
-    return child_process.spawn(`${__dirname}/trx/rx`, [
-      '-m',
-      2,
-      '-j',
-      4,
-      '-p',
-      port,
-    ]);
-  };
-  tx = (address, port) => {
-    console.log(`${__dirname}/trx/tx`, ['-m', 2, '-j', 4, '-p', port]);
-    return child_process.spawn(`${__dirname}/trx/tx`, [
-      '-c',
-      1,
-      '-m',
-      2,
-      '-h',
-      address,
-      '-p',
-      port,
-    ]);
-  };
-} else if (streamingTech === 'gst-python') {
-  rx = (address, port) => {
-    console.log('python3', [`${__dirname}/trx/rx.py`, address, port]);
-    return child_process.spawn('python3', [
-      `${__dirname}/trx/rx.py`,
-      address,
-      port,
-    ]);
-  };
-  tx = (address, port) => {
-    console.log('python3', [`${__dirname}/trx/tx.py`, address, port]);
-    return child_process.spawn('python3', [
-      `${__dirname}/trx/tx.py`,
-      address,
-      port,
-    ]);
-  };
-}
+const socket = io(SOCKET_SERVER);
+const streamer = new TrxStreamer();
 
 socket.on('connect', async () => {
   console.log('connected');
@@ -107,6 +50,7 @@ socket.on('connect', async () => {
 
 socket.on('disconnect', () => {
   console.log('disconnected');
+  streamer.stop();
 });
 
 socket.on('chat message', (msg) => console.log('message:', msg));
@@ -117,46 +61,20 @@ socket.on('start receiving', async ({ id, address }, callback) => {
   console.log(
     `starting to recv from ${id} at ${address} on ${info.remote.address}:${info.remote.port}/${info.local.port}`
   );
-  const child = rx('localhost', info.local.port);
-  streamers[id] = { rx: child, ...streamers[id] };
-  console.log(streamers);
-  child.on('close', (code) => {
-    console.log(`rx exited with code ${code}`);
-    streamers[id].rx = undefined;
-    cleanup();
-    console.log(streamers);
-  });
+  streamer.startReceiving(id, 'localhost', info.local.port);
 });
 
 socket.on('stop receiving', ({ id, address }) => {
   console.log(`stop recving from ${id} at ${address}`);
-  const child = streamers[id].rx;
-  if (child) {
-    child.kill();
-  } else {
-    console.log('??? No rx child?');
-  }
+  streamer.stopReceiving(id, address);
 });
 
 socket.on('start sending', ({ id, address, port }) => {
   console.log(`starting to send to ${id} on ${address}:${port}`);
-  const child = tx(address, port);
-  streamers[id] = { tx: child, ...streamers[id] };
-  console.log(streamers);
-  child.on('close', (code) => {
-    console.log(`tx exited with code ${code}`);
-    streamers[id].tx = undefined;
-    cleanup();
-    console.log(streamers);
-  });
+  streamer.startSending(id, address, port);
 });
 
 socket.on('stop sending', ({ id, address }) => {
   console.log(`stop sending to ${id} on ${address}`);
-  const child = streamers[id].tx;
-  if (child) {
-    child.kill();
-  } else {
-    console.log('??? No tx child?');
-  }
+  streamer.stopSending(id, address);
 });

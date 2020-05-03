@@ -12,6 +12,7 @@
   "scripts": {
     "start": "electron src/client",
     "cli": "node src/client/cli.js",
-    "server": "node src/server"
+    "server": "node src/server",
+    "test": "jest"
   }
 }
