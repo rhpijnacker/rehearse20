@@ -21,10 +21,10 @@
     "webpack-cli": "^3.3.11"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
-    "gui": "npm run build && electron dist/client/main.js",
-    "cli": "npm run build && node dist/client/cli.js",
-    "server": "npm run build && node dist/server",
+    "build": "tsc",
+    "gui": "npm run build && electron src/client/main.js",
+    "cli": "npm run build && node src/client/cli.js",
+    "server": "npm run build && node src/server",
     "test": "jest"
   }
 }

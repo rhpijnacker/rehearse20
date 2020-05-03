@@ -1,5 +1,5 @@
-import * as dgram from 'dgram';
-import * as url from 'url';
+import dgram from 'dgram';
+import url from 'url';
 
 // TODO: this does not have to be a class
 

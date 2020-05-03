@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import  './SocketConnection';
+import './SocketConnection';
 
 const urlParams = new URLSearchParams(window.location.search);
 const name = urlParams.get('name');
