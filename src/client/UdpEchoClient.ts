@@ -4,7 +4,7 @@ import * as url from 'url';
 // TODO: this does not have to be a class
 
 class UdpEchoClient {
-  echo(localPort, echoServer): Promise<{ address: string, port: string }> {
+  echo(localPort, echoServer): Promise<{ address: string; port: string }> {
     const socket = dgram.createSocket('udp4');
 
     socket.on('listening', () => {
@@ -43,4 +43,4 @@ class UdpEchoClient {
   }
 }
 
-export { UdpEchoClient };
+export default UdpEchoClient;

@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "gui": "npm run build && electron dist/client",
+    "gui": "npm run build && electron dist/client/main.js",
     "cli": "npm run build && node dist/client/cli.js",
     "server": "npm run build && node dist/server",
     "test": "jest"

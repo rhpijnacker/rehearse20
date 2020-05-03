@@ -31,7 +31,7 @@ class TrxStreamer {
     });
   }
 
-  stopReceiving(id, address='') {
+  stopReceiving(id, address = '') {
     const child = this.streamers[id].rx;
     if (child) {
       child.kill();
@@ -52,7 +52,7 @@ class TrxStreamer {
     });
   }
 
-  stopSending(id, address='') {
+  stopSending(id, address = '') {
     const child = this.streamers[id].tx;
     if (child) {
       child.kill();
@@ -123,4 +123,4 @@ class TrxStreamer {
   }
 }
 
-export { TrxStreamer };
+export default TrxStreamer;

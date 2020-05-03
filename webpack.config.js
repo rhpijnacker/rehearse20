@@ -43,4 +43,29 @@ module.exports = [
       }),
     ],
   },
+  {
+    mode: 'development',
+    entry: './src/client/session.tsx',
+    target: 'electron-renderer',
+    devtool: 'source-map',
+    module: {
+      rules: [
+        {
+          test: /\.ts(x?)$/,
+          include: /src/,
+          use: [{ loader: 'ts-loader' }],
+        },
+      ],
+    },
+    output: {
+      path: __dirname + '/dist/client',
+      filename: 'session.js',
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        filename: 'session.html',
+        template: './src/client/session.html',
+      }),
+    ],
+  },
 ];
