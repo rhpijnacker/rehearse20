@@ -1,8 +1,12 @@
-const child_process = require('child_process');
+import * as child_process from 'child_process';
 
 const TRX = 'trx'; // trx|gst-python
 
 class TrxStreamer {
+  streamers: any;
+  rx: any;
+  tx: any;
+
   constructor() {
     // { <id>: { rx: <ChildProcess>, tx: <ChildProcess> }, ... }
     this.streamers = {};
@@ -11,11 +15,11 @@ class TrxStreamer {
       this.tx = this.trxTx;
     } else {
       this.rx = this.gstPyRx;
-      this.ty = this.gstPyTx;
+      this.tx = this.gstPyTx;
     }
   }
 
-    startReceiving(id, address, port) {
+  startReceiving(id, address, port) {
     const child = this.rx(address, port);
     this.streamers[id] = { rx: child, ...this.streamers[id] };
     console.log(this.streamers);
@@ -27,7 +31,7 @@ class TrxStreamer {
     });
   }
 
-  stopReceiving(id, address) {
+  stopReceiving(id, address='') {
     const child = this.streamers[id].rx;
     if (child) {
       child.kill();
@@ -48,7 +52,7 @@ class TrxStreamer {
     });
   }
 
-  stopSending(id, address) {
+  stopSending(id, address='') {
     const child = this.streamers[id].tx;
     if (child) {
       child.kill();
@@ -58,7 +62,7 @@ class TrxStreamer {
   }
 
   stop() {
-    Object.keys(this.streamers).forEach(key => {
+    Object.keys(this.streamers).forEach((key) => {
       this.stopReceiving(key);
       this.stopSending(key);
     });
@@ -119,4 +123,4 @@ class TrxStreamer {
   }
 }
 
-module.exports = TrxStreamer;
+export { TrxStreamer };

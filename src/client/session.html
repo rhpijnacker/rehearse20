@@ -19,8 +19,6 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const name = urlParams.get('name');
-    const global = { name };
-
     const greeting = document.getElementsByName('greeting');
     greeting.textContent = `Hi ${name},`
 

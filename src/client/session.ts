@@ -1,12 +1,13 @@
-const io = require('socket.io-client');
-const UdpEchoClient = require('./UdpEchoClient');
-const TrxStreamer = require('./TrxStreamer');
+import * as io from 'socket.io-client';
+import { TrxStreamer } from './TrxStreamer';
+import { UdpEchoClient } from './UdpEchoClient';
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
 const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
 
-const name = process.argv[2] || 'John Doe';
-const startPort = parseInt(process.argv[3] || 51350, 10);
+const urlParams = new URLSearchParams(window.location.search);
+const name = urlParams.get('name');
+const startPort = 51350;
 
 const getExternalPort = async (localPort) => {
   const client = new UdpEchoClient();

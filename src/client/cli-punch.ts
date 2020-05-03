@@ -1,8 +1,8 @@
-const UdpEchoClient = require('./UdpEchoClient');
+import { UdpEchoClient } from './UdpEchoClient';
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
 
-const localPort = parseInt(process.argv[2] || 51350, 10);
+const localPort = parseInt(process.argv[2] || '51350', 10);
 
 const client = new UdpEchoClient();
 (async () => {

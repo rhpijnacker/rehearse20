@@ -1,10 +1,10 @@
-const dgram = require('dgram');
-const url = require('url');
+import * as dgram from 'dgram';
+import * as url from 'url';
 
 // TODO: this does not have to be a class
 
 class UdpEchoClient {
-  echo(localPort, echoServer) {
+  echo(localPort, echoServer): Promise<{ address: string, port: string }> {
     const socket = dgram.createSocket('udp4');
 
     socket.on('listening', () => {
@@ -23,30 +23,24 @@ class UdpEchoClient {
         socket.close();
       });
 
-      socket.bind({ port: localPort, exclusive: true }, (error) => {
-        if (error) {
-          console.log('bind', error);
-          socket.close();
-          reject(error);
-        } else {
-          const serverProps = url.parse(echoServer);
+      socket.bind({ port: localPort, exclusive: true }, () => {
+        const serverProps = url.parse(echoServer);
 
-          socket.send(
-            'Echo...!',
-            serverProps.port,
-            serverProps.hostname,
-            (error) => {
-              if (error) {
-                console.log('send', error);
-                socket.close();
-                reject(error);
-              }
+        socket.send(
+          'Echo...!',
+          parseInt(serverProps.port, 10),
+          serverProps.hostname,
+          (error) => {
+            if (error) {
+              console.log('send', error);
+              socket.close();
+              reject(error);
             }
-          );
-        }
+          }
+        );
       });
     });
   }
 }
 
-module.exports = UdpEchoClient;
+export { UdpEchoClient };
