@@ -3,19 +3,29 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Hello World!</title>
+  <title>Rehearse 2.0</title>
   <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
   <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+
+  <link href="stylesheet" src="style.css" />
 </head>
 
 <body>
-  <h1>Hello World!</h1>
-  We are using node
-  <script>document.write(process.versions.node)</script>,
-  Chrome
-  <script>document.write(process.versions.chrome)</script>,
-  and Electron
-  <script>document.write(process.versions.electron)</script>.
+  <h1>Rehearse 2.0</h1>
+
+  <label>Your name: <input type="text" id="name"></label>
+  <button type="button" id="button">Enter</button>
+
+  <script>
+    const name = document.getElementById('name');
+    document.getElementById('button').addEventListener('click', () => {
+      if (!name.value) {
+        // add red
+      } else {
+        location.href = `session.html?name=${name.value}`;
+      }
+    });
+  </script>
 </body>
 
 </html>

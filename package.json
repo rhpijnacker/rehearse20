@@ -10,7 +10,7 @@
     "prettier": "^2.0.5"
   },
   "scripts": {
-    "start": "electron src/client",
+    "gui": "electron src/client",
     "cli": "node src/client/cli.js",
     "server": "node src/server",
     "test": "jest"

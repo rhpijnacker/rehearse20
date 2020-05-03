@@ -1,5 +1,3 @@
-const electron = require('electron');
-
 const { app, BrowserWindow } = require('electron');
 
 createWindow = () => {
@@ -11,6 +9,7 @@ createWindow = () => {
     },
   });
   window.loadFile('index.html');
+  window.webContents.openDevTools()
 };
 
 app.whenReady().then(createWindow);

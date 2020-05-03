@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Rehearse 2.0</title>
+  <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+  <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" /> -->
+
+  <link href="stylesheet" src="style.css" />
+</head>
+
+<body>
+  <h1>Rehearse 2.0</h1>
+
+  <div class="greeting"></div>
+  We are in session!
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name');
+    const global = { name };
+
+    const greeting = document.getElementsByName('greeting');
+    greeting.textContent = `Hi ${name},`
+
+    require('./session.js')
+  </script>
+</body>
+
+</html>
