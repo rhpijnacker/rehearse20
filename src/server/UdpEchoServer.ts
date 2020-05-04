@@ -1,6 +1,8 @@
-const dgram = require('dgram');
+import dgram from 'dgram';
 
 class UdpEchoServer {
+  socket: any;
+
   constructor() {
     this.socket = dgram.createSocket('udp4');
 
@@ -19,7 +21,11 @@ class UdpEchoServer {
   }
 
   echoBack(message, remote) {
-    console.log(`Echo request received from ${remote.address}:${remote.port}: ${messagage.toString()}`);
+    console.log(
+      `Echo request received from ${remote.address}:${
+        remote.port
+      }: ${message.toString()}`
+    );
     this.socket.send(
       Buffer.from(`udp://${remote.address}:${remote.port}`),
       remote.port,
@@ -31,4 +37,4 @@ class UdpEchoServer {
   }
 }
 
-module.exports = UdpEchoServer;
+export default UdpEchoServer;

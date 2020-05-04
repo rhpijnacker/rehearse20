@@ -1,13 +1,13 @@
-const express = require('express');
-const http = require('http');
-const socketio = require('socket.io');
-const UdpEchoServer = require('./UdpEchoServer');
+import express from 'express';
+import http from 'http';
+import socketio from 'socket.io';
+import UdpEchoServer from './UdpEchoServer';
 
 const echoServer = new UdpEchoServer();
 echoServer.listen(50051);
 
-const app = express();
-const server = http.createServer(app);
+// const app = express();
+const server = http.createServer();
 const io = socketio(server);
 
 server.listen(3000, () => {
@@ -19,7 +19,7 @@ let sockets = [];
 io.on('connection', (socket) => {
   console.log('socket connected');
 
-  const self = { id: socket.id, socket };
+  const self = { id: socket.id, address: undefined, name: undefined, socket };
 
   socket.on('disconnect', () => {
     sockets = sockets.filter((s) => s.socket !== self.socket);
