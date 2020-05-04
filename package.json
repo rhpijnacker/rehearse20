@@ -22,9 +22,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "gui": "npm run build && electron src/client/main.js",
-    "cli": "npm run build && node src/client/cli.js",
-    "server": "npm run build && node src/server",
-    "test": "jest"
+    "gui": "electron src/client/main.js",
+    "cli": "node src/client/cli.js",
+    "server": "node src/server",
+    "test": "jest",
+    "watch": "tsc -w"
   }
 }
