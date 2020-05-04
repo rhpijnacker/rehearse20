@@ -1,10 +1,13 @@
 {
   "dependencies": {
+    "@material-ui/icons": "^4.9.1",
     "express": "^4.17.1",
     "socket.io": "^2.3.0",
-    "stun": "^2.1.0"
+    "stun": "^2.1.0",
+    "typeface-roboto": "0.0.75"
   },
   "devDependencies": {
+    "@material-ui/core": "^4.9.12",
     "@types/electron": "^1.6.10",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.7",

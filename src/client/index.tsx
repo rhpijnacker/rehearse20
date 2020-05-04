@@ -1,19 +1,45 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
-const Index = () => {
-  const [name, setName] = useState('');
+import {
+  Button,
+  Container,
+  CssBaseline,
+  TextField,
+  Typography,
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
-  const onKeyUp = (event) => {
-    console.log(event.target.value);
-    if (event.key === 'Enter') {
-      navigateToSession();
-    } else {
-      setName(event.target.value);
-    }
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {},
+}));
+
+const Index = () => {
+  const classes = useStyles();
+
+  const [name, setName] = useState('');
+  const [isSubmitAllowed, setSubmitAllowed] = useState(false);
+
+  const onChange = (event) => {
+    const value = event.target.value;
+    setName(value);
+    setSubmitAllowed(!!value);
   };
 
-  const onClick = () => navigateToSession();
+  const onSubmit = (event) => {
+    event.preventDefault();
+    navigateToSession();
+  };
 
   const navigateToSession = () => {
     if (name) {
@@ -22,15 +48,38 @@ const Index = () => {
   };
 
   return (
-    <div>
-      <h1>Rehearse 2.0</h1>
-      <label>
-        Your name: <input type="text" onKeyUp={onKeyUp}></input>
-      </label>
-      <button disabled={!name} onClick={onClick}>
-        Enter
-      </button>
-    </div>
+    <Container maxWidth="xs">
+      <div className={classes.paper}>
+        <CssBaseline />
+        <Typography component="h1" variant="h5">
+          Join session
+        </Typography>
+        <form className={classes.form} onSubmit={onSubmit}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            label="Your name"
+            id="name"
+            name="name"
+            autoComplete="given-name"
+            autoFocus
+            onChange={onChange}
+          />
+          <Button
+            disabled={!isSubmitAllowed}
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            Enter
+          </Button>
+        </form>
+      </div>
+    </Container>
   );
 };
 
