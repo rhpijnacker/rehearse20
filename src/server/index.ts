@@ -42,11 +42,12 @@ io.on('connection', (socket) => {
   socket.on('identify', ({ name, address }, callback) => {
     console.log(`identified ${name} on ${address}`);
     sockets.forEach((s) => s.socket.emit('user joined', { id: self.id, name }));
+    const currentUsers = sockets.map((s) => ({ id: s.id, name: s.name }));
+    callback(currentUsers);
     self.address = address;
     self.name = name;
     sockets.push(self);
     console.log(`#${sockets.length} connected`);
-    callback();
   });
 
   socket.on('chat message', (msg) => {

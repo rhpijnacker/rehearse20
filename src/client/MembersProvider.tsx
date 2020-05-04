@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import membersContext, { Member } from './membersContext';
 
 const MembersProvider = (props) => {
-  const [members, setMembers] = React.useState([]);
+  const [members, setMembers] = useState([]);
 
   const addMember = (member: Member) => {
-    setMembers([...members, member]);
+    const updated = [...members, member];
+    console.log('addMember:', members, updated);
+    setMembers(updated);
   };
 
   const removeMember = (member: Member) => {
-    setMembers(members.filter((m) => m.id !== member.id));
+    const updated = members.filter((m) => m.id !== member.id);
+    console.log('removeMember:', members, updated);
+    setMembers(updated);
   };
 
   return (
@@ -17,6 +22,10 @@ const MembersProvider = (props) => {
       {props.children}
     </membersContext.Provider>
   );
+};
+
+MembersProvider.propTypes = {
+  children: PropTypes.node,
 };
 
 export default MembersProvider;

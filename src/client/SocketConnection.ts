@@ -5,8 +5,8 @@ import UdpEchoClient from './UdpEchoClient';
 import membersContext from './membersContext';
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
-const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
-// const SOCKET_SERVER = 'http://localhost:3000';
+// const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
+const SOCKET_SERVER = 'http://localhost:3000';
 
 const SocketConnection = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -40,9 +40,8 @@ const SocketConnection = () => {
     }
   };
 
-  const members = useContext(membersContext);
-
-  console.log(members);
+  const { members, addMember, removeMember } = useContext(membersContext);
+  console.log(members.map((m) => m.name));
 
   useEffect(() => {
     const socket = subscribeToSocket();
@@ -57,7 +56,18 @@ const SocketConnection = () => {
       console.log('connected');
       const randomPort = 54321;
       const { address } = await getExternalPort(randomPort);
-      socket.emit('identify', { name, address }, () => {
+      socket.emit('identify', { name, address }, (currentMembers) => {
+        console.log('<identify>', members.map((m) => m.name));
+        currentMembers.forEach((m) => {
+          addMember({ id: m.id, name: m.name });
+        });
+        currentMembers.forEach((m) => {
+          addMember({ id: m.id, name: m.name });
+        });
+        currentMembers.forEach((m) => {
+          addMember({ id: m.id, name: m.name });
+        });
+        console.log('</identify>', members.map((m) => m.name));
         socket.emit('start streaming');
       });
     });
@@ -70,11 +80,11 @@ const SocketConnection = () => {
     socket.on('chat message', (msg) => console.log('message:', msg));
     socket.on('user joined', ({ id, name }) => {
       console.log('user joined:', name, id);
-      members.addMember({ id, name });
+      addMember({ id, name });
     });
     socket.on('user left', ({ id, name }) => {
       console.log('user left:', name, id);
-      members.removeMember({ id, name });
+      removeMember({ id, name });
     });
 
     socket.on('start receiving', async ({ id, address }, callback) => {
