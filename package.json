@@ -25,7 +25,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "gui": "electron src/client/main.js",
+    "gui": "electron src/client/main.js &",
     "cli": "node src/client/cli.js",
     "server": "node src/server",
     "test": "jest",

@@ -1,0 +1,12 @@
++ Refactor the client socket-io code
++ Use a proper client framework such as React
++ Add some styling
+
+- Show list of attendees
+- Session management
+- Show volume controls
+- Connect volume controls
+- Build distributables
+
+- Manage the forked processes, e.g. crash-restart
+
