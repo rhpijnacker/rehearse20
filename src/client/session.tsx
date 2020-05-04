@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import { Container, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import './SocketConnection';
+import MembersList from './MembersList';
+import MembersProvider from './MembersProvider';
+import SocketConnection from './SocketConnection';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -22,16 +24,20 @@ const name = urlParams.get('name');
 const Session = () => {
   const classes = useStyles();
   return (
-    <Container maxWidth="xs">
-      <div className={classes.paper}>
-        <CssBaseline />
-        <Typography component="h1" variant="h5">
-          Rehearse 2.0
-        </Typography>
-        <div className={classes.greeting}>Hi {name}</div>
-        We are in session!
-      </div>
-    </Container>
+    <MembersProvider>
+      <Container maxWidth="xs">
+        <div className={classes.paper}>
+          <CssBaseline />
+          <Typography component="h1" variant="h5">
+            Rehearse 2.0
+          </Typography>
+          <div className={classes.greeting}>Hi {name}</div>
+          We are in session!
+        </div>
+        <MembersList></MembersList>
+      </Container>
+      <SocketConnection />
+    </MembersProvider>
   );
 };
 

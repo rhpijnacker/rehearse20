@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
     console.log(`disconnected ${self.name}`);
     console.log(`#${sockets.length} left`);
     sockets.forEach((s) => {
-      s.socket.emit('chat message', `${self.name} left`);
+      s.socket.emit('user left', { id: self.id, name: self.name });
       s.socket.emit('stop sending', {
         id: self.id,
         name: self.name,
@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
 
   socket.on('identify', ({ name, address }, callback) => {
     console.log(`identified ${name} on ${address}`);
-    sockets.forEach((s) => s.socket.emit('chat mesage', `${name} joined`));
+    sockets.forEach((s) => s.socket.emit('user joined', { id: self.id, name }));
     self.address = address;
     self.name = name;
     sockets.push(self);
