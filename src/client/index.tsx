@@ -93,7 +93,6 @@ const Index = () => {
               disabled={!isSubmitAllowed}
               type="submit"
               fullWidth
-              color="primary"
               className={classes.submit}
             >
               Enter
