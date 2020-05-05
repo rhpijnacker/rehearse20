@@ -67,7 +67,7 @@ const SocketConnection = () => {
       console.log('connected');
       const randomPort = 54321;
       const { address } = await getExternalPort(randomPort);
-      socket.emit('identify', { name, address }, () => {
+      socket.emit('identify', { name, address, sessionId }, () => {
         socket.emit('start streaming');
       });
     });

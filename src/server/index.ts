@@ -18,10 +18,28 @@ interface Client {
   id: string;
   address: string;
   name: string;
+  sessionId: string;
   socket: Socket;
 }
 
-const clients = new Set<Client>();
+// sessionId -> Set<Client>
+const sessions = new Map<string, Set<Client>>();
+
+function initializeSession(sessionId: string) {
+  let session = sessions.get(sessionId);
+  if (!session) {
+    session = new Set<Client>();
+    sessions.set(sessionId, session);
+  }
+  return session;
+}
+
+function cleanupSession(sessionId: string) {
+  const session = sessions.get(sessionId);
+  if (session && session.size === 0) {
+    sessions.delete(sessionId);
+  }
+}
 
 io.on('connect', (socket) => {
   console.log('socket connected');
@@ -30,34 +48,42 @@ io.on('connect', (socket) => {
     id: socket.id,
     address: undefined,
     name: undefined,
+    sessionId: undefined,
     socket,
   };
+  // clients connected to the same session
+  let clients: Set<Client>;
 
   socket.on('disconnect', () => {
-    clients.delete(client);
-    console.log(`disconnected ${client.name}`);
-    console.log(`#${clients.size} left`);
-    clients.forEach((c) => {
-      c.socket.emit('user left', { id: client.id, name: client.name });
-      c.socket.emit('stop sending', {
-        id: client.id,
-        name: client.name,
-        address: client.address,
+    if (client.name) {
+      console.log(`disconnected ${client.name}`);
+      clients.delete(client);
+      clients.forEach((c) => {
+        c.socket.emit('user left', { id: client.id, name: client.name });
+        c.socket.emit('stop sending', {
+          id: client.id,
+          name: client.name,
+          address: client.address,
+        });
+        c.socket.emit('stop receiving', {
+          id: client.id,
+          address: client.address,
+        });
       });
-      c.socket.emit('stop receiving', {
-        id: client.id,
-        address: client.address,
-      });
-    });
+      console.log(`#${clients.size} left`);
+      cleanupSession(client.sessionId);
+    }
   });
 
-  socket.on('identify', ({ name, address }, callback) => {
-    console.log(`identified ${name} on ${address}`);
+  socket.on('identify', ({ name, address, sessionId }, callback) => {
+    console.log(`identified ${name} on ${address} for session ${sessionId}`);
+    clients = initializeSession(sessionId);
     clients.forEach((c) =>
       c.socket.emit('user joined', { id: client.id, name })
     );
     client.address = address;
     client.name = name;
+    client.sessionId = sessionId;
     clients.add(client);
     console.log(`#${clients.size} connected`);
     callback();
