@@ -1,12 +1,12 @@
-import express from 'express';
+// import express from 'express';
 import http from 'http';
-import socketio from 'socket.io';
+import socketio, { Socket } from 'socket.io';
 import UdpEchoServer from './UdpEchoServer';
 
 const echoServer = new UdpEchoServer();
 echoServer.listen(50051);
 
-const app = express();
+// const app = express();
 const server = http.createServer();
 const io = socketio(server);
 
@@ -14,38 +14,52 @@ server.listen(3000, () => {
   console.log('listening on *:3000');
 });
 
-let sockets = [];
+interface Client {
+  id: string;
+  address: string;
+  name: string;
+  socket: Socket;
+}
+
+const clients = new Set<Client>();
 
 io.on('connect', (socket) => {
   console.log('socket connected');
 
-  const self = { id: socket.id, address: undefined, name: undefined, socket };
+  const client: Client = {
+    id: socket.id,
+    address: undefined,
+    name: undefined,
+    socket,
+  };
 
   socket.on('disconnect', () => {
-    sockets = sockets.filter((s) => s.socket !== self.socket);
-    console.log(`disconnected ${self.name}`);
-    console.log(`#${sockets.length} left`);
-    sockets.forEach((s) => {
-      s.socket.emit('user left', { id: self.id, name: self.name });
-      s.socket.emit('stop sending', {
-        id: self.id,
-        name: self.name,
-        address: self.address,
+    clients.delete(client);
+    console.log(`disconnected ${client.name}`);
+    console.log(`#${clients.size} left`);
+    clients.forEach((c) => {
+      c.socket.emit('user left', { id: client.id, name: client.name });
+      c.socket.emit('stop sending', {
+        id: client.id,
+        name: client.name,
+        address: client.address,
       });
-      s.socket.emit('stop receiving', {
-        id: self.id,
-        address: self.address,
+      c.socket.emit('stop receiving', {
+        id: client.id,
+        address: client.address,
       });
     });
   });
 
   socket.on('identify', ({ name, address }, callback) => {
     console.log(`identified ${name} on ${address}`);
-    sockets.forEach((s) => s.socket.emit('user joined', { id: self.id, name }));
-    self.address = address;
-    self.name = name;
-    sockets.push(self);
-    console.log(`#${sockets.length} connected`);
+    clients.forEach((c) =>
+      c.socket.emit('user joined', { id: client.id, name })
+    );
+    client.address = address;
+    client.name = name;
+    clients.add(client);
+    console.log(`#${clients.size} connected`);
     callback();
   });
 
@@ -55,16 +69,15 @@ io.on('connect', (socket) => {
   });
 
   socket.on('start streaming', () => {
-    sockets
-      .filter((s) => s.socket !== self.socket) // not to myself
-      .forEach((other) => {
-        self.socket.emit(
+    clients.forEach((other) => {
+      if (other !== client) {
+        client.socket.emit(
           'start receiving',
           { id: other.id, address: other.address },
           ({ address, port }) => {
             other.socket.emit('start sending', {
-              id: self.id,
-              name: self.name,
+              id: client.id,
+              name: client.name,
               address,
               port,
             });
@@ -72,9 +85,9 @@ io.on('connect', (socket) => {
         );
         other.socket.emit(
           'start receiving',
-          { id: self.id, address: self.address },
+          { id: client.id, address: client.address },
           ({ address, port }) => {
-            self.socket.emit('start sending', {
+            client.socket.emit('start sending', {
               id: other.id,
               name: other.name,
               address,
@@ -82,6 +95,7 @@ io.on('connect', (socket) => {
             });
           }
         );
-      });
+      }
+    });
   });
 });
