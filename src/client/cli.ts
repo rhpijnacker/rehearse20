@@ -1,17 +1,20 @@
 import io from 'socket.io-client';
 import TrxStreamer from './TrxStreamer';
 import UdpEchoClient from './UdpEchoClient';
+import { Socket } from 'socket.io';
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
-// const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
 const SOCKET_SERVER = 'http://localhost:3000';
 
 const name = process.argv[2] || 'John Doe';
-const startPort = parseInt(process.argv[3] || '51350', 10);
+const sessionId = process.argv[3] || 'default';
+const startPort = parseInt(process.argv[4] || '51350', 10);
+let externalAddress;
 
 const getExternalPort = async (localPort) => {
   const client = new UdpEchoClient();
   const { address, port } = await client.echo(localPort, ECHO_SERVER);
+  externalAddress = address;
   // Assume straight port-maps for now
   return { address, localPort };
   // return { address, port };
@@ -19,8 +22,13 @@ const getExternalPort = async (localPort) => {
 
 let nextFreePort = startPort;
 const getFreePort = async () => {
-  const client = new UdpEchoClient();
   const port = nextFreePort;
+  nextFreePort = nextFreePort + 2;
+  return {
+    local: { port },
+    remote: { address: externalAddress, port },
+  };
+  const client = new UdpEchoClient();
   let externalPort = 0;
   while (!externalPort) {
     nextFreePort = nextFreePort + 2; // RPT uses the +1 port too
@@ -43,7 +51,7 @@ socket.on('connect', async () => {
   console.log('connected');
   const randomPort = 54321;
   const { address } = await getExternalPort(randomPort);
-  socket.emit('identify', { name, address }, () => {
+  socket.emit('identify', { name, address, sessionId }, () => {
     socket.emit('start streaming');
   });
 });

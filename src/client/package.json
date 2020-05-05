@@ -1,0 +1,25 @@
+{
+  "name": "rehearse20",
+  "version": "0.0.1",
+  "description": "Rehease online 2.0",
+  "main": "main.js",
+  "dependencies": {
+    "@material-ui/core": "^4.9.12",
+    "@material-ui/icons": "^4.9.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "socket.io": "^2.3.0",
+    "typeface-roboto": "0.0.75"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhpijnacker/rehearse20.git"
+  },
+  "keywords": [],
+  "author": "Ronald Pijnacker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rhpijnacker/rehearse20/issues"
+  },
+  "homepage": "https://github.com/rhpijnacker/rehearse20#readme"
+}

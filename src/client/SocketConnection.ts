@@ -1,21 +1,25 @@
 import React, { useContext, useEffect } from 'react';
 import io from 'socket.io-client';
+import { Socket } from 'socket.io';
+
 import TrxStreamer from './TrxStreamer';
 import UdpEchoClient from './UdpEchoClient';
 import membersContext from './membersContext';
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
-// const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
 const SOCKET_SERVER = 'http://localhost:3000';
 
 const SocketConnection = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const name = urlParams.get('name');
+  const sessionId = urlParams.get('sessionId') || 'default';
   const startPort = 51350;
+  let externalAddress;
 
   const getExternalPort = async (localPort) => {
     const client = new UdpEchoClient();
     const { address, port } = await client.echo(localPort, ECHO_SERVER);
+    externalAddress = address;
     // Assume straight port-maps for now
     return { address, localPort };
     // return { address, port };
@@ -23,8 +27,13 @@ const SocketConnection = () => {
 
   let nextFreePort = startPort;
   const getFreePort = async () => {
-    const client = new UdpEchoClient();
     const port = nextFreePort;
+    nextFreePort = nextFreePort + 2;
+    return {
+      local: { port },
+      remote: { address: externalAddress, port },
+    };
+    const client = new UdpEchoClient();
     let externalPort = 0;
     while (!externalPort) {
       nextFreePort = nextFreePort + 2; // RPT uses the +1 port too
@@ -32,7 +41,8 @@ const SocketConnection = () => {
         const remote = await client.echo(port, ECHO_SERVER);
         return {
           local: { port },
-          remote: remote,
+          // Assume straight port-maps for now
+          remote: { address: remote.address, port: port },
         };
       } catch (error) {
         console.log(`Could not external port for :${port}`);
@@ -49,14 +59,14 @@ const SocketConnection = () => {
   }, []);
 
   const subscribeToSocket = () => {
-    const socket = io(SOCKET_SERVER);
+    const socket = io(SOCKET_SERVER, { transports: ['websocket'] });
     const streamer = new TrxStreamer();
 
     socket.on('connect', async () => {
       console.log('connected');
       const randomPort = 54321;
       const { address } = await getExternalPort(randomPort);
-      socket.emit('identify', { name, address }, (currentMembers) => {
+      socket.emit('identify', { name, address, sessionId }, (currentMembers) => {
         console.log('<identify>', members.map((m) => m.name));
         currentMembers.forEach((m) => {
           addMember({ id: m.id, name: m.name });

@@ -15,6 +15,7 @@ class UdpEchoClient {
     return new Promise((resolve, reject) => {
       socket.on('message', (message) => {
         // message should be: url://<hostname>:<port>
+        console.log('Echo reply:', message.toString());
         const externalProps = url.parse(message.toString());
         resolve({ address: externalProps.hostname, port: externalProps.port });
         console.log(

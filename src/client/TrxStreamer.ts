@@ -22,42 +22,48 @@ class TrxStreamer {
   startReceiving(id, address, port) {
     const child = this.rx(address, port);
     this.streamers[id] = { rx: child, ...this.streamers[id] };
-    console.log(this.streamers);
+    // console.log(this.streamers);
     child.on('close', (code) => {
       console.log(`rx exited with code ${code}`);
       this.streamers[id].rx = undefined;
       this.cleanup();
-      console.log(this.streamers);
+      // console.log(this.streamers);
     });
   }
 
   stopReceiving(id, address = '') {
-    const child = this.streamers[id].rx;
-    if (child) {
-      child.kill();
-    } else {
-      console.log('??? No rx child?');
+    const streamer = this.streamers[id];
+    if (streamer) {
+      const child = streamer.rx;
+      if (child) {
+        child.kill();
+      } else {
+        console.log('??? No rx child?');
+      }
     }
   }
 
   startSending(id, address, port) {
     const child = this.tx(address, port);
     this.streamers[id] = { tx: child, ...this.streamers[id] };
-    console.log(this.streamers);
+    // console.log(this.streamers);
     child.on('close', (code) => {
       console.log(`tx exited with code ${code}`);
       this.streamers[id].tx = undefined;
       this.cleanup();
-      console.log(this.streamers);
+      // console.log(this.streamers);
     });
   }
 
   stopSending(id, address = '') {
-    const child = this.streamers[id].tx;
-    if (child) {
-      child.kill();
-    } else {
-      console.log('??? No tx child?');
+    const streamer = this.streamers[id];
+    if (streamer) {
+      const child = streamer.tx;
+      if (child) {
+        child.kill();
+      } else {
+        console.log('??? No tx child?');
+      }
     }
   }
 

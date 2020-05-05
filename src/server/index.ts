@@ -1,6 +1,6 @@
-import express from 'express';
+// import express from 'express';
 import http from 'http';
-import socketio from 'socket.io';
+import socketio, { Socket } from 'socket.io';
 import UdpEchoServer from './UdpEchoServer';
 
 const echoServer = new UdpEchoServer();
@@ -14,40 +14,83 @@ server.listen(3000, () => {
   console.log('listening on *:3000');
 });
 
-let sockets = [];
+interface Client {
+  id: string;
+  address: string;
+  name: string;
+  sessionId: string;
+  socket: Socket;
+}
 
-io.on('connection', (socket) => {
+// sessionId -> Set<Client>
+const sessions = new Map<string, Set<Client>>();
+
+function initializeSession(sessionId: string) {
+  let session = sessions.get(sessionId);
+  if (!session) {
+    session = new Set<Client>();
+    sessions.set(sessionId, session);
+  }
+  return session;
+}
+
+function cleanupSession(sessionId: string) {
+  const session = sessions.get(sessionId);
+  if (session && session.size === 0) {
+    sessions.delete(sessionId);
+  }
+}
+
+io.on('connect', (socket) => {
   console.log('socket connected');
 
-  const self = { id: socket.id, address: undefined, name: undefined, socket };
+  const client: Client = {
+    id: socket.id,
+    address: undefined,
+    name: undefined,
+    sessionId: undefined,
+    socket,
+  };
+  // clients connected to the same session
+  let clients: Set<Client>;
 
   socket.on('disconnect', () => {
-    sockets = sockets.filter((s) => s.socket !== self.socket);
-    console.log(`disconnected ${self.name}`);
-    console.log(`#${sockets.length} left`);
-    sockets.forEach((s) => {
-      s.socket.emit('user left', { id: self.id, name: self.name });
-      s.socket.emit('stop sending', {
-        id: self.id,
-        name: self.name,
-        address: self.address,
+    if (client.name) {
+      console.log(`disconnected ${client.name}`);
+      clients.delete(client);
+      clients.forEach((c) => {
+        c.socket.emit('user left', { id: client.id, name: client.name });
+        c.socket.emit('stop sending', {
+          id: client.id,
+          name: client.name,
+          address: client.address,
+        });
+        c.socket.emit('stop receiving', {
+          id: client.id,
+          address: client.address,
+        });
       });
-      s.socket.emit('stop receiving', {
-        id: self.id,
-        address: self.address,
-      });
-    });
+      console.log(`#${clients.size} left`);
+      cleanupSession(client.sessionId);
+    }
   });
 
-  socket.on('identify', ({ name, address }, callback) => {
-    console.log(`identified ${name} on ${address}`);
-    sockets.forEach((s) => s.socket.emit('user joined', { id: self.id, name }));
-    const currentUsers = sockets.map((s) => ({ id: s.id, name: s.name }));
+  socket.on('identify', ({ name, address, sessionId }, callback) => {
+    console.log(`identified ${name} on ${address} for session ${sessionId}`);
+    clients = initializeSession(sessionId);
+    clients.forEach((c) =>
+      c.socket.emit('user joined', { id: client.id, name })
+    );
+    const currentUsers = [...clients.values()].map((c) => ({
+      id: c.id,
+      name: c.name,
+    }));
     callback(currentUsers);
-    self.address = address;
-    self.name = name;
-    sockets.push(self);
-    console.log(`#${sockets.length} connected`);
+    client.address = address;
+    client.name = name;
+    client.sessionId = sessionId;
+    clients.add(client);
+    console.log(`#${clients.size} connected`);
   });
 
   socket.on('chat message', (msg) => {
@@ -56,16 +99,15 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start streaming', () => {
-    sockets
-      .filter((s) => s.socket !== self.socket) // not to myself
-      .forEach((other) => {
-        self.socket.emit(
+    clients.forEach((other) => {
+      if (other !== client) {
+        client.socket.emit(
           'start receiving',
           { id: other.id, address: other.address },
           ({ address, port }) => {
             other.socket.emit('start sending', {
-              id: self.id,
-              name: self.name,
+              id: client.id,
+              name: client.name,
               address,
               port,
             });
@@ -73,9 +115,9 @@ io.on('connection', (socket) => {
         );
         other.socket.emit(
           'start receiving',
-          { id: self.id, address: self.address },
+          { id: client.id, address: client.address },
           ({ address, port }) => {
-            self.socket.emit('start sending', {
+            client.socket.emit('start sending', {
               id: other.id,
               name: other.name,
               address,
@@ -83,6 +125,7 @@ io.on('connection', (socket) => {
             });
           }
         );
-      });
+      }
+    });
   });
 });

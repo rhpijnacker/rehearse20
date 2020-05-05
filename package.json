@@ -1,34 +1,39 @@
 {
+  "name": "rehearse20",
+  "version": "0.0.1",
+  "description": "Rehease online 2.0",
   "dependencies": {
-    "@material-ui/icons": "^4.9.1",
-    "express": "^4.17.1",
-    "socket.io": "^2.3.0",
-    "stun": "^2.1.0",
-    "typeface-roboto": "0.0.75"
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
-    "@material-ui/core": "^4.9.12",
     "@types/electron": "^1.6.10",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.7",
     "@types/socket.io": "^2.1.4",
     "electron": "^8.2.5",
-    "html-webpack-plugin": "^4.3.0",
+    "electron-packager": "^14.2.1",
     "jest": "^25.5.4",
     "prettier": "^2.0.5",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "ts-loader": "^7.0.2",
-    "typescript": "^3.8.3",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "build": "tsc",
+    "package": "electron-packager src/client --platform darwin,linux --out dist",
     "gui": "electron src/client/main.js &",
     "cli": "node src/client/cli.js",
     "server": "node src/server",
     "test": "jest",
     "watch": "tsc -w"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhpijnacker/rehearse20.git"
+  },
+  "keywords": [],
+  "author": "Ronald Pijnacker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rhpijnacker/rehearse20/issues"
+  },
+  "homepage": "https://github.com/rhpijnacker/rehearse20#readme"
 }

@@ -8,7 +8,13 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from '@material-ui/core/styles';
+
+const theme = createMuiTheme({ palette: { type: 'dark' } });
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -28,12 +34,19 @@ const Index = () => {
   const classes = useStyles();
 
   const [name, setName] = useState('');
+  const [sessionId, setSessionId] = useState('');
   const [isSubmitAllowed, setSubmitAllowed] = useState(false);
 
-  const onChange = (event) => {
+  const onNameChange = (event) => {
     const value = event.target.value;
     setName(value);
-    setSubmitAllowed(!!value);
+    setSubmitAllowed(!!value && !!sessionId);
+  };
+
+  const onSessionIdChange = (event) => {
+    const value = event.target.value;
+    setSessionId(value);
+    setSubmitAllowed(!!value && !!name);
   };
 
   const onSubmit = (event) => {
@@ -43,43 +56,51 @@ const Index = () => {
 
   const navigateToSession = () => {
     if (name) {
-      location.href = `session.html?name=${name}`;
+      location.href = `session.html?name=${name}&sessionId=${sessionId}`;
     }
   };
 
   return (
-    <Container maxWidth="xs">
-      <div className={classes.paper}>
-        <CssBaseline />
-        <Typography component="h1" variant="h5">
-          Join session
-        </Typography>
-        <form className={classes.form} onSubmit={onSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            label="Your name"
-            id="name"
-            name="name"
-            autoComplete="given-name"
-            autoFocus
-            onChange={onChange}
-          />
-          <Button
-            disabled={!isSubmitAllowed}
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Enter
-          </Button>
-        </form>
-      </div>
-    </Container>
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="xs">
+        <div className={classes.paper}>
+          <CssBaseline />
+          <Typography component="h1" variant="h5">
+            Join session
+          </Typography>
+          <form className={classes.form} onSubmit={onSubmit}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Your name"
+              id="name"
+              name="name"
+              autoComplete="given-name"
+              autoFocus
+              onChange={onNameChange}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Session ID"
+              id="sessionId"
+              name="sessionId"
+              onChange={onSessionIdChange}
+            />
+            <Button
+              disabled={!isSubmitAllowed}
+              type="submit"
+              fullWidth
+              className={classes.submit}
+            >
+              Enter
+            </Button>
+          </form>
+        </div>
+      </Container>
+    </ThemeProvider>
   );
 };
 
