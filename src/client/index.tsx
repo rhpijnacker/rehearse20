@@ -15,7 +15,6 @@ import {
 } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({ palette: { type: 'dark' } });
-console.log(theme);
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,12 +34,19 @@ const Index = () => {
   const classes = useStyles();
 
   const [name, setName] = useState('');
+  const [sessionId, setSessionId] = useState('');
   const [isSubmitAllowed, setSubmitAllowed] = useState(false);
 
-  const onChange = (event) => {
+  const onNameChange = (event) => {
     const value = event.target.value;
     setName(value);
-    setSubmitAllowed(!!value);
+    setSubmitAllowed(!!value && !!sessionId);
+  };
+
+  const onSessionIdChange = (event) => {
+    const value = event.target.value;
+    setSessionId(value);
+    setSubmitAllowed(!!value && !!name);
   };
 
   const onSubmit = (event) => {
@@ -50,7 +56,7 @@ const Index = () => {
 
   const navigateToSession = () => {
     if (name) {
-      location.href = `session.html?name=${name}`;
+      location.href = `session.html?name=${name}&sessionId=${sessionId}`;
     }
   };
 
@@ -64,7 +70,6 @@ const Index = () => {
           </Typography>
           <form className={classes.form} onSubmit={onSubmit}>
             <TextField
-              variant="outlined"
               margin="normal"
               required
               fullWidth
@@ -73,13 +78,21 @@ const Index = () => {
               name="name"
               autoComplete="given-name"
               autoFocus
-              onChange={onChange}
+              onChange={onNameChange}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Session ID"
+              id="sessionId"
+              name="sessionId"
+              onChange={onSessionIdChange}
             />
             <Button
               disabled={!isSubmitAllowed}
               type="submit"
               fullWidth
-              variant="contained"
               color="primary"
               className={classes.submit}
             >
