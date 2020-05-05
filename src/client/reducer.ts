@@ -6,8 +6,9 @@ const members = (state = [], action) => {
     case actions.ADD_MEMBER:
       return [...state, action.member];
     case actions.REMOVE_MEMBER:
-      const result = state.filter((member) => member.id !== action.member.id);
-      return result;
+      return state.filter((member) => member.id !== action.member.id);
+    case actions.CLEAR_MEMBERS:
+      return [];
     default:
       return state;
   }

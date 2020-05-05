@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 
 import TrxStreamer from './TrxStreamer';
 import UdpEchoClient from './UdpEchoClient';
-import { addMember, removeMember } from './actions';
+import { addMember, removeMember, clearMembers } from './actions';
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
 const SOCKET_SERVER = 'http://localhost:3000';
@@ -69,6 +69,7 @@ const SocketConnection = (props) => {
         { name, address, sessionId },
         (currentMembers) => {
           console.log('currentMembers', currentMembers);
+          store.dispatch(clearMembers());
           currentMembers.forEach((member) => store.dispatch(addMember(member)));
           socket.emit('start streaming');
         }
