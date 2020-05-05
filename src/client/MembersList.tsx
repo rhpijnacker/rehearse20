@@ -1,10 +1,7 @@
-import React, { useContext } from 'react';
-import membersContext from './membersContext';
+import React from 'react';
+import { connect } from 'react-redux';
 
-const MemberList = () => {
-  const { members } = useContext(membersContext);
-
-  console.log('MemberList', members.map((m) => m.name));
+const MemberList = ({ members }) => {
   return (
     <ul>
       {members.map((member) => (
@@ -14,4 +11,8 @@ const MemberList = () => {
   );
 };
 
-export default MemberList;
+const mapStateToProps = (state) => ({
+  members: state.members,
+});
+
+export default connect(mapStateToProps)(MemberList);

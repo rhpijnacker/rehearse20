@@ -1,15 +1,16 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import io from 'socket.io-client';
-import { Socket } from 'socket.io';
 
 import TrxStreamer from './TrxStreamer';
 import UdpEchoClient from './UdpEchoClient';
-import membersContext from './membersContext';
+import { addMember, removeMember } from './actions';
 
 const ECHO_SERVER = 'udp://rehearse20.sijben.dev:50051';
 const SOCKET_SERVER = 'http://localhost:3000';
 
-const SocketConnection = () => {
+const SocketConnection = (props) => {
+  const store = props.store;
+  console.log('SocketConnection', store);
   const urlParams = new URLSearchParams(window.location.search);
   const name = urlParams.get('name');
   const sessionId = urlParams.get('sessionId') || 'default';
@@ -50,9 +51,6 @@ const SocketConnection = () => {
     }
   };
 
-  const { members, addMember, removeMember } = useContext(membersContext);
-  console.log(members.map((m) => m.name));
-
   useEffect(() => {
     const socket = subscribeToSocket();
     return () => unSubscribeFromSocket(socket);
@@ -66,20 +64,15 @@ const SocketConnection = () => {
       console.log('connected');
       const randomPort = 54321;
       const { address } = await getExternalPort(randomPort);
-      socket.emit('identify', { name, address, sessionId }, (currentMembers) => {
-        console.log('<identify>', members.map((m) => m.name));
-        currentMembers.forEach((m) => {
-          addMember({ id: m.id, name: m.name });
-        });
-        currentMembers.forEach((m) => {
-          addMember({ id: m.id, name: m.name });
-        });
-        currentMembers.forEach((m) => {
-          addMember({ id: m.id, name: m.name });
-        });
-        console.log('</identify>', members.map((m) => m.name));
-        socket.emit('start streaming');
-      });
+      socket.emit(
+        'identify',
+        { name, address, sessionId },
+        (currentMembers) => {
+          console.log('currentMembers', currentMembers);
+          currentMembers.forEach((member) => store.dispatch(addMember(member)));
+          socket.emit('start streaming');
+        }
+      );
     });
 
     socket.on('disconnect', () => {
@@ -90,11 +83,11 @@ const SocketConnection = () => {
     socket.on('chat message', (msg) => console.log('message:', msg));
     socket.on('user joined', ({ id, name }) => {
       console.log('user joined:', name, id);
-      addMember({ id, name });
+      store.dispatch(addMember({ id, name }));
     });
     socket.on('user left', ({ id, name }) => {
       console.log('user left:', name, id);
-      removeMember({ id, name });
+      store.dispatch(removeMember({ id, name }));
     });
 
     socket.on('start receiving', async ({ id, address }, callback) => {

@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
 
 import { Container, CssBaseline, Typography } from '@material-ui/core';
 import {
@@ -9,11 +11,12 @@ import {
 } from '@material-ui/core/styles';
 
 import MembersList from './MembersList';
-import MembersProvider from './MembersProvider';
 import SocketConnection from './SocketConnection';
+import members from './reducer';
+
+const store = createStore(members);
 
 const theme = createMuiTheme({ palette: { type: 'dark' } });
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -30,8 +33,8 @@ const name = urlParams.get('name');
 const Session = () => {
   const classes = useStyles();
   return (
-    <ThemeProvider theme={theme}>
-      <MembersProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
         <Container maxWidth="xs">
           <div className={classes.paper}>
             <CssBaseline />
@@ -43,9 +46,9 @@ const Session = () => {
           </div>
           <MembersList></MembersList>
         </Container>
-        <SocketConnection />
-      </MembersProvider>
-    </ThemeProvider>
+        <SocketConnection store={store} />
+      </ThemeProvider>
+    </Provider>
   );
 };
 
