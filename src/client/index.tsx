@@ -8,7 +8,14 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from '@material-ui/core/styles';
+
+const theme = createMuiTheme({ palette: { type: 'dark' } });
+console.log(theme);
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -48,38 +55,40 @@ const Index = () => {
   };
 
   return (
-    <Container maxWidth="xs">
-      <div className={classes.paper}>
-        <CssBaseline />
-        <Typography component="h1" variant="h5">
-          Join session
-        </Typography>
-        <form className={classes.form} onSubmit={onSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            label="Your name"
-            id="name"
-            name="name"
-            autoComplete="given-name"
-            autoFocus
-            onChange={onChange}
-          />
-          <Button
-            disabled={!isSubmitAllowed}
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Enter
-          </Button>
-        </form>
-      </div>
-    </Container>
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="xs">
+        <div className={classes.paper}>
+          <CssBaseline />
+          <Typography component="h1" variant="h5">
+            Join session
+          </Typography>
+          <form className={classes.form} onSubmit={onSubmit}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              label="Your name"
+              id="name"
+              name="name"
+              autoComplete="given-name"
+              autoFocus
+              onChange={onChange}
+            />
+            <Button
+              disabled={!isSubmitAllowed}
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Enter
+            </Button>
+          </form>
+        </div>
+      </Container>
+    </ThemeProvider>
   );
 };
 
