@@ -3,12 +3,7 @@
   "version": "0.0.1",
   "description": "Rehease online 2.0",
   "dependencies": {
-    "@material-ui/core": "^4.9.12",
-    "@material-ui/icons": "^4.9.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "socket.io": "^2.3.0",
-    "typeface-roboto": "0.0.75"
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "@types/electron": "^1.6.10",
@@ -23,6 +18,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "package": "electron-packager src/client --platform darwin,linux --out dist",
     "gui": "electron src/client/main.js &",
     "cli": "node src/client/cli.js",
     "server": "node src/server",
