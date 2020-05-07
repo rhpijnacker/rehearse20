@@ -1,22 +1,43 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { List, ListItem, Paper } from '@material-ui/core';
+import { List, Paper } from '@material-ui/core';
+import * as actions from './actions';
+import MemberItem from './MemberItem';
 
-const MemberList = ({ members }) => {
+const MemberList = () => {
+  const members = useSelector((state) => state.members);
+  const trxs = useSelector((state) => state.trx);
+  const dispatch = useDispatch();
+
+  const onVolumeClick = (id) => {
+    console.log('volume click');
+    const isRecving = trxs[id].isRecving;
+    if (isRecving) {
+      dispatch(actions.stopRecving(id));
+    } else {
+      dispatch(actions.startRecving(id));
+    }
+  };
+
   return (
     <Paper>
       <List>
-        {members.map((member) => (
-          <ListItem key={member.id}>{member.name}</ListItem>
-        ))}
+        {members.map((member) => {
+          const trx = trxs[member.id];
+          console.log('member', member, 'trx', trx);
+          return (
+            <MemberItem
+              key={member.id}
+              member={member}
+              trx={trx}
+              onVolumeClick={onVolumeClick}
+            />
+          );
+        })}
       </List>
     </Paper>
   );
 };
 
-const mapStateToProps = (state) => ({
-  members: state.members,
-});
-
-export default connect(mapStateToProps)(MemberList);
+export default MemberList;

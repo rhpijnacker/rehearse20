@@ -128,4 +128,34 @@ io.on('connect', (socket) => {
       }
     });
   });
+
+  socket.on('mute microphone', ({ isMuted }) => {
+    clients.forEach((other) => {
+      if (other !== client) {
+        if (isMuted) {
+          client.socket.emit('stop sending', {
+            id: other.id,
+            address: other.address,
+          });
+          other.socket.emit('stop receiving', {
+            id: client.id,
+            address: client.address,
+          });
+        } else {
+          other.socket.emit(
+            'start receiving',
+            { id: client.id, address: client.address },
+            ({ address, port }) => {
+              client.socket.emit('start sending', {
+                id: other.id,
+                name: other.name,
+                address,
+                port,
+              });
+            }
+          );
+        }
+      }
+    });
+  });
 });

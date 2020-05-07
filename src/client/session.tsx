@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore } from 'redux';
+import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
+import { createLogger } from 'redux-logger';
 
 import { Container, CssBaseline, Typography } from '@material-ui/core';
 import {
@@ -12,9 +13,11 @@ import {
 
 import MembersList from './MembersList';
 import SocketConnection from './SocketConnection';
-import members from './reducer';
+import VolumeControl from './VolumeControl';
+import reducer from './reducer';
 
-const store = createStore(members);
+const logger = createLogger({ collapsed: true });
+const store = createStore(reducer, applyMiddleware(logger));
 
 const theme = createMuiTheme({ palette: { type: 'dark' } });
 const useStyles = makeStyles((theme) => ({
@@ -45,6 +48,7 @@ const Session = () => {
             We are in session!
           </div>
           <MembersList></MembersList>
+          <VolumeControl></VolumeControl>
         </Container>
         <SocketConnection store={store} />
       </ThemeProvider>
