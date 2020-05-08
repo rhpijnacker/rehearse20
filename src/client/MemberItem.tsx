@@ -23,7 +23,7 @@ const useStyles = makeStyles({
   },
 });
 
-const MemberItem = ({ member, trx = {}, onVolumeClick }) => {
+const MemberItem = ({ member, trx, onVolumeClick }) => {
   const classes = useStyles();
 
   const isRecving = trx.isRecving || false;
