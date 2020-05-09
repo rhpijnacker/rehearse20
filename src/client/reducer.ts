@@ -1,6 +1,14 @@
 import * as actions from './actions';
 import { combineReducers } from 'redux';
 
+export interface TrxState {
+  rxPort: number;
+  txPort: number;
+  txAddress: string;
+  isRecving: boolean;
+  isSending: boolean;
+};
+
 const members = (state = [], action) => {
   switch (action.type) {
     case actions.ADD_MEMBER:
@@ -14,10 +22,25 @@ const members = (state = [], action) => {
   }
 };
 
-const trx = (state = {}, action) => {
-  const current = state[action.id] || {};
-  console.log(current);
+const initialTrxState: TrxState = {
+  txAddress: "",
+  txPort: 0,
+  rxPort: 0,
+  isRecving: false,
+  isSending: false
+};
+
+const trx = (state = [], action) => {
+  const current = state[action.id] || initialTrxState;
+  console.log("trx", action, state, current);
   switch (action.type) {
+    case actions.ADD_MEMBER:
+      return {
+        ...state,
+        [action.member.id]: {
+          ...current
+        }
+      };
     case actions.START_RECVING:
       return {
         ...state,
