@@ -17,6 +17,7 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
+    "postinstall": "cd src/client && npm ci",
     "build": "tsc",
     "package": "electron-packager src/client --platform darwin,linux --out dist",
     "gui": "electron src/client/main.js &",
