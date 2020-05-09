@@ -14,7 +14,7 @@ import {
 import MembersList from './MembersList';
 import SocketConnection from './SocketConnection';
 import VolumeControl from './VolumeControl';
-import reducer from './reducer';
+import { reducer } from './reducer';
 
 const logger = createLogger({ collapsed: true });
 const store = createStore(reducer, applyMiddleware(logger));

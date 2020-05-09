@@ -71,4 +71,6 @@ const volume = (state = { isMuted: false }, action) => {
   }
 };
 
-export default combineReducers({ members, trx, volume });
+export const reducer = combineReducers({ members, trx, volume });
+
+export type RootState = ReturnType<typeof reducer>;

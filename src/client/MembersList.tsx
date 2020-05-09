@@ -2,12 +2,14 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { List, Paper } from '@material-ui/core';
+import { RootState } from './reducer';
 import * as actions from './actions';
 import MemberItem from './MemberItem';
 
+
 const MemberList = () => {
-  const members = useSelector((state) => state.members);
-  const trxs = useSelector((state) => state.trx);
+  const members = useSelector((state: RootState) => state.members);
+  const trxs = useSelector((state: RootState) => state.trx);
   const dispatch = useDispatch();
 
   const onVolumeClick = (id) => {

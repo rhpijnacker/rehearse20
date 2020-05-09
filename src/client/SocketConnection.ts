@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from './reducer';
 import io from 'socket.io-client';
 
 import TrxStreamer from './TrxStreamer';
@@ -51,8 +52,8 @@ const getFreePort = async () => {
 
 const SocketConnection = (props) => {
   const dispatch = useDispatch();
-  const members = useSelector((state) => state.members);
-  const volume = useSelector((state) => state.volume);
+  const members = useSelector((state: RootState) => state.members);
+  const volume = useSelector((state: RootState) => state.volume);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
