@@ -23,18 +23,20 @@ const MemberList = () => {
   return (
     <Paper>
       <List>
-        {members.map((member) => {
-          const trx = trxs[member.id];
-          console.log('member', member, 'trx', trx);
-          return (
-            <MemberItem
-              key={member.id}
-              member={member}
-              trx={trx}
-              onVolumeClick={onVolumeClick}
-            />
-          );
-        })}
+        {members.length === 0
+          ? 'Waiting for others to join...'
+          : members.map((member) => {
+              const trx = trxs[member.id];
+              console.log('member', member, 'trx', trx);
+              return (
+                <MemberItem
+                  key={member.id}
+                  member={member}
+                  trx={trx}
+                  onVolumeClick={onVolumeClick}
+                />
+              );
+            })}
       </List>
     </Paper>
   );
