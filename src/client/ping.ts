@@ -12,7 +12,7 @@ export default function ping(target): Promise<PingResults> {
     const args =
       process.platform === 'win32'
         ? [target, '-n', '10']
-        : [target, '-c', '10', 'A'];
+        : [target, '-c', '10', '-A'];
     const child = child_process.spawn('ping', args);
     child.stdout.on('data', function (msg) {
       msg = msg.toString();
