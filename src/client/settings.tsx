@@ -41,8 +41,11 @@ const Settings = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <PingChecker />
-      <Link href="index.html">&lt; Back</Link>
+      <Container maxWidth="xl">
+        <CssBaseline />
+        <PingChecker />
+        <Link href="index.html">&lt; Back</Link>
+      </Container>
     </ThemeProvider>
   );
 };
