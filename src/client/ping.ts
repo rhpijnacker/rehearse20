@@ -1,6 +1,12 @@
 import child_process from 'child_process';
 
-export default function ping(target) {
+interface PingResults {
+  min: number;
+  avg: number;
+  max: number;
+}
+
+export default function ping(target): Promise<PingResults> {
   return new Promise((resolve) => {
     let min, avg, max;
     const args =

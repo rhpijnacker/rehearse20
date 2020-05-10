@@ -5,6 +5,7 @@ import {
   Button,
   Container,
   CssBaseline,
+  Link,
   TextField,
   Typography,
 } from '@material-ui/core';
@@ -13,8 +14,11 @@ import {
   makeStyles,
   ThemeProvider,
 } from '@material-ui/core/styles';
+import * as color from '@material-ui/core/colors';
 
-const theme = createMuiTheme({ palette: { type: 'dark' } });
+const theme = createMuiTheme({
+  palette: { type: 'dark', primary: { main: color.lightBlue['300'] } },
+});
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -98,6 +102,7 @@ const Index = () => {
               Enter
             </Button>
           </form>
+          <Link href="settings.html">Settings</Link>
         </div>
       </Container>
     </ThemeProvider>
