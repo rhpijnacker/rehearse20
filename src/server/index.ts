@@ -22,13 +22,17 @@ interface Client {
   socket: Socket;
 }
 
-// sessionId -> Set<Client>
-const sessions = new Map<string, Set<Client>>();
+class Session extends Set<Client> {
+  
+}
+
+// sessionId -> Session
+const sessions = new Map<string, Session>();
 
 function initializeSession(sessionId: string) {
   let session = sessions.get(sessionId);
   if (!session) {
-    session = new Set<Client>();
+    session = new Session();
     sessions.set(sessionId, session);
   }
   return session;
@@ -52,13 +56,13 @@ io.on('connect', (socket) => {
     socket,
   };
   // clients connected to the same session
-  let clients: Set<Client>;
+  let otherClients: Set<Client>;
 
   socket.on('disconnect', () => {
     if (client.name) {
       console.log(`disconnected ${client.name}`);
-      clients.delete(client);
-      clients.forEach((c) => {
+      otherClients.delete(client);
+      otherClients.forEach((c) => {
         c.socket.emit('user left', { id: client.id, name: client.name });
         c.socket.emit('stop sending', {
           id: client.id,
@@ -70,18 +74,18 @@ io.on('connect', (socket) => {
           address: client.address,
         });
       });
-      console.log(`#${clients.size} left`);
+      console.log(`#${otherClients.size} left`);
       cleanupSession(client.sessionId);
     }
   });
 
   socket.on('identify', ({ name, address, sessionId }, callback) => {
     console.log(`identified ${name} on ${address} for session ${sessionId}`);
-    clients = initializeSession(sessionId);
-    clients.forEach((c) =>
+    otherClients = initializeSession(sessionId);
+    otherClients.forEach((c) =>
       c.socket.emit('user joined', { id: client.id, name })
     );
-    const currentUsers = [...clients.values()].map((c) => ({
+    const currentUsers = [...otherClients.values()].map((c) => ({
       id: c.id,
       name: c.name,
     }));
@@ -89,8 +93,8 @@ io.on('connect', (socket) => {
     client.address = address;
     client.name = name;
     client.sessionId = sessionId;
-    clients.add(client);
-    console.log(`#${clients.size} connected`);
+    otherClients.add(client);
+    console.log(`#${otherClients.size} connected`);
   });
 
   socket.on('chat message', (msg) => {
@@ -99,7 +103,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('start streaming', () => {
-    clients.forEach((other) => {
+    otherClients.forEach((other) => {
       if (other !== client) {
         client.socket.emit(
           'start receiving',
@@ -130,7 +134,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('mute microphone', ({ isMuted }) => {
-    clients.forEach((other) => {
+    otherClients.forEach((other) => {
       if (other !== client) {
         if (isMuted) {
           client.socket.emit('stop sending', {
