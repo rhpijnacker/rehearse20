@@ -1,6 +1,9 @@
 // import express from 'express';
 import http from 'http';
 import socketio, { Socket } from 'socket.io';
+
+import Session, { Client } from './Session';
+import SessionManager from './SessionManager';
 import UdpEchoServer from './UdpEchoServer';
 
 const echoServer = new UdpEchoServer();
@@ -14,40 +17,11 @@ server.listen(3000, () => {
   console.log('listening on *:3000');
 });
 
-interface Client {
-  id: string;
-  address: string;
-  name: string;
-  sessionId: string;
-  socket: Socket;
-}
-
-class Session extends Set<Client> {
-  
-}
-
-// sessionId -> Session
-const sessions = new Map<string, Session>();
-
-function initializeSession(sessionId: string) {
-  let session = sessions.get(sessionId);
-  if (!session) {
-    session = new Session();
-    sessions.set(sessionId, session);
-  }
-  return session;
-}
-
-function cleanupSession(sessionId: string) {
-  const session = sessions.get(sessionId);
-  if (session && session.size === 0) {
-    sessions.delete(sessionId);
-  }
-}
-
 io.on('connect', (socket) => {
   console.log('socket connected');
 
+  // session this client is connected to
+  let session: Session;
   const client: Client = {
     id: socket.id,
     address: undefined,
@@ -55,14 +29,12 @@ io.on('connect', (socket) => {
     sessionId: undefined,
     socket,
   };
-  // clients connected to the same session
-  let otherClients: Set<Client>;
 
   socket.on('disconnect', () => {
     if (client.name) {
       console.log(`disconnected ${client.name}`);
-      otherClients.delete(client);
-      otherClients.forEach((c) => {
+      session.delete(client);
+      session.forEach((c) => {
         c.socket.emit('user left', { id: client.id, name: client.name });
         c.socket.emit('stop sending', {
           id: client.id,
@@ -74,18 +46,18 @@ io.on('connect', (socket) => {
           address: client.address,
         });
       });
-      console.log(`#${otherClients.size} left`);
-      cleanupSession(client.sessionId);
+      console.log(`#${session.size} left`);
+      SessionManager.cleanupSession(client.sessionId);
     }
   });
 
   socket.on('identify', ({ name, address, sessionId }, callback) => {
     console.log(`identified ${name} on ${address} for session ${sessionId}`);
-    otherClients = initializeSession(sessionId);
-    otherClients.forEach((c) =>
+    session = SessionManager.initializeSession(sessionId);
+    session.forEach((c) =>
       c.socket.emit('user joined', { id: client.id, name })
     );
-    const currentUsers = [...otherClients.values()].map((c) => ({
+    const currentUsers = [...session.values()].map((c) => ({
       id: c.id,
       name: c.name,
     }));
@@ -93,8 +65,8 @@ io.on('connect', (socket) => {
     client.address = address;
     client.name = name;
     client.sessionId = sessionId;
-    otherClients.add(client);
-    console.log(`#${otherClients.size} connected`);
+    session.add(client);
+    console.log(`#${session.size} connected`);
   });
 
   socket.on('chat message', (msg) => {
@@ -103,7 +75,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('start streaming', () => {
-    otherClients.forEach((other) => {
+    session.forEach((other) => {
       if (other !== client) {
         client.socket.emit(
           'start receiving',
@@ -134,7 +106,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('mute microphone', ({ isMuted }) => {
-    otherClients.forEach((other) => {
+    session.forEach((other) => {
       if (other !== client) {
         if (isMuted) {
           client.socket.emit('stop sending', {
