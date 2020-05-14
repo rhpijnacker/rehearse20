@@ -7,7 +7,7 @@ import DummyStreamer from './DummyStreamer';
 import TrxStreamer from './TrxStreamer';
 import * as actions from './actions';
 
-const SOCKET_SERVER = 'http://localhost:3000';
+const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
 
 const urlParams = new URLSearchParams(window.location.search);
 const name = urlParams.get('name');

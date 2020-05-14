@@ -5,15 +5,11 @@ import * as dgram from 'dgram';
 
 import Session, { Client } from './Session';
 import SessionManager from './SessionManager';
-import UdpEchoServer from './UdpEchoServer';
 import { unpack } from '../lib/rtppacket';
 
-const rtpIdentPort = 51350;
+const rtpIdentPort = 50051;
 const serverId = 'server';
-const serverAddress = 'localhost';
-
-const echoServer = new UdpEchoServer();
-echoServer.listen(50051);
+const serverAddress = 'rehearse20.sijben.dev';
 
 // const app = express();
 const server = http.createServer();
