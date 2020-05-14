@@ -11,7 +11,7 @@ class DummyStreamer {
     this.streamers = new Map();
   }
 
-  startSending(id, localPort, remoteAddress, remotePort, ssrc?) {
+  startSending(id, localPort, remoteAddress, remotePort, ssrc) {
     const child = this.trx(localPort, remoteAddress, remotePort, ssrc);
     child.on('close', (code) => {
       console.log(`trx exited with code ${code}`);
@@ -35,17 +35,27 @@ class DummyStreamer {
   stop() {
     this.streamers.forEach((child, id) => {
       this.stopSending(id);
-    })
+    });
   }
 
   trx(localPort, remoteAddress, remotePort, ssrc) {
-    return spawn('node', [
+    console.log('node', [
       path.join(__dirname, 'trx', 'dummy_trx.js'),
       localPort,
       remoteAddress,
       remotePort,
       ssrc,
     ]);
+    const child = spawn('node', [
+      path.join(__dirname, 'trx', 'dummy_trx.js'),
+      localPort,
+      remoteAddress,
+      remotePort,
+      ssrc,
+    ]);
+    child.stdout.on('data', (data) => console.log(data.toString()));
+    child.stderr.on('data', (data) => console.error(data));
+    return child;
   }
 }
 
