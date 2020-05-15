@@ -45,14 +45,21 @@ const ports = new Map<number, number>();
 
 const SocketConnection = (props) => {
   const dispatch = useDispatch();
-  const members = useSelector((state) => state.members);
   const volume = useSelector((state) => state.volume);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     const socket = subscribeToSocket();
     setSocket(socket);
-    return () => unSubscribeFromSocket(socket);
+    const unsubscribeBeforeUnload = (event) => {
+      event.preventDefault();
+      unsubscribeFromSocket(socket);
+    };
+    window.addEventListener('beforeunload', unsubscribeBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', unsubscribeBeforeUnload);
+      unsubscribeFromSocket(socket);
+    };
   }, []);
 
   useEffect(() => {
@@ -112,7 +119,7 @@ const SocketConnection = (props) => {
     return socket;
   };
 
-  const unSubscribeFromSocket = (socket) => {
+  const unsubscribeFromSocket = (socket) => {
     socket.disconnect();
   };
 
