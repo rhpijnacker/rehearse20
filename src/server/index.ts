@@ -10,6 +10,7 @@ import { unpack } from '../lib/rtppacket';
 const rtpIdentPort = 50051;
 const serverId = 'server';
 const serverAddress = 'rehearse20.sijben.dev';
+// const serverAddress = '192.168.2.6';
 
 // const app = express();
 const server = http.createServer();
@@ -39,7 +40,6 @@ udpSocket.on('message', (payload, remote) => {
   const resolve = pendingIdentifications.get(ssrc);
   if (resolve) {
     console.log(`Identified ${ssrc} at ${remote.address}:${remote.port}`);
-    console.log({ remote });
     pendingIdentifications.delete(ssrc);
     resolve(remote);
   } else {

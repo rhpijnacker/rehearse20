@@ -8,6 +8,7 @@ import TrxStreamer from './TrxStreamer';
 import * as actions from './actions';
 
 const SOCKET_SERVER = 'http://149.210.193.195:3000'; // rehearse20.sijben.dev
+// const SOCKET_SERVER = 'http://192.168.2.6:3000'; // Ronald lokaal
 
 const urlParams = new URLSearchParams(window.location.search);
 const name = urlParams.get('name');
@@ -75,7 +76,7 @@ const SocketConnection = (props) => {
     socket.on('connect', async () => {
       console.log('connected');
       socket.emit('identify', { name, sessionId }, (currentMembers) => {
-        console.log('currentMembers', currentMembers);
+        // console.log('currentMembers', currentMembers);
         dispatch(actions.clearMembers());
         currentMembers.forEach((member) => dispatch(actions.addMember(member)));
         socket.emit('start streaming');
