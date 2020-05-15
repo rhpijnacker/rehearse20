@@ -62,7 +62,7 @@ const SocketConnection = (props) => {
   }, [volume.isMuted]);
 
   const subscribeToSocket = () => {
-    const socket = io(SOCKET_SERVER, { transports: ['websocket'] });
+    const socket = io(SOCKET_SERVER); // { transports: ['websocket'] });
     const streamer = new DummyStreamer();
 
     socket.on('connect', async () => {
