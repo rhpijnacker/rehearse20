@@ -7,7 +7,7 @@ import DummyStreamer from './DummyStreamer';
 import TrxStreamer from './TrxStreamer';
 import * as actions from './actions';
 
-const SOCKET_SERVER = 'http://rehearse20.sijben.dev:3000';
+const SOCKET_SERVER = 'http://149.210.193.195:3000'; // rehearse20.sijben.dev
 
 const urlParams = new URLSearchParams(window.location.search);
 const name = urlParams.get('name');
@@ -62,7 +62,7 @@ const SocketConnection = (props) => {
   }, [volume.isMuted]);
 
   const subscribeToSocket = () => {
-    const socket = io(SOCKET_SERVER); // { transports: ['websocket'] });
+    const socket = io(SOCKET_SERVER, { transports: ['websocket'] });
     const streamer = new DummyStreamer();
 
     socket.on('connect', async () => {
