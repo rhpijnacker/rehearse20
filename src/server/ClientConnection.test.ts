@@ -107,7 +107,7 @@ it('should remove a leaving client from the session', () => {
   socket1.emit('disconnect');
 
   expect(session.size).toBe(1);
-  const ids = [...session.keys()].map(s => s.id);
+  const ids = [...session.keys()].map((s) => s.id);
   expect(ids).toStrictEqual(['socket-2']);
 });
 
@@ -185,26 +185,27 @@ it('should obtain the external adress and port from clients streaming to the ser
   sinon.assert.calledWith(callback2, { id: ClientConnection.serverId });
 });
 
-it('should streaming peer to peer when the ports are known', async () => {
+it('should streaming to all peers when the ports are known', async () => {
   const socket1 = identifyNewClient('socket-1', 'Name1', 'Session');
   const socket2 = identifyNewClient('socket-2', 'Name2', 'Session');
+  const socket3 = identifyNewClient('socket-3', 'Name3', 'Session');
+  const socket4 = identifyNewClient('socket-4', 'Name4', 'Session');
   const session = SessionManager.initializeSession('Session');
-  const getSSrcsStub = sinon
-    .stub(session, 'getSsrc')
-    .onFirstCall()
-    .returns(1234)
-    .onSecondCall()
-    .returns(5678);
+  let ssrc = 1;
+  const getSSrcsStub = sinon.stub(session, 'getSsrc').callsFake(() => ssrc++);
   const waitForIdentPackageStub = sinon
     .stub(rtpPortIdentifier, 'waitForIdentPackage')
-    .withArgs(1234)
-    .resolves({ address: '1.2.3.4', port: 1234 })
-    .withArgs(5678)
-    .resolves({ address: '5.6.7.8', port: 5678 });
+    .callsFake((i) =>
+      Promise.resolve({ address: `1.1.1.${i}`, port: 1110 + i })
+    );
   const callback1 = sinon.stub();
   socket1.on('start sending', callback1);
   const callback2 = sinon.stub();
   socket2.on('start sending', callback2);
+  const callback3 = sinon.stub();
+  socket3.on('start sending', callback3);
+  const callback4 = sinon.stub();
+  socket4.on('start sending', callback4);
 
   socket1.emit('start streaming');
 
@@ -213,15 +214,43 @@ it('should streaming peer to peer when the ports are known', async () => {
   sinon.assert.calledWith(callback1, {
     id: socket2.id,
     name: 'Name2',
-    address: '5.6.7.8',
-    port: 5678,
-    ssrc: 1234,
+    address: '1.1.1.2',
+    port: 1112,
+    ssrc: 1,
   });
   sinon.assert.calledWith(callback2, {
     id: socket1.id,
     name: 'Name1',
-    address: '1.2.3.4',
-    port: 1234,
-    ssrc: 5678,
+    address: '1.1.1.1',
+    port: 1111,
+    ssrc: 2,
+  });
+  sinon.assert.calledWith(callback1, {
+    id: socket3.id,
+    name: 'Name3',
+    address: '1.1.1.4',
+    port: 1114,
+    ssrc: 3,
+  });
+  sinon.assert.calledWith(callback3, {
+    id: socket1.id,
+    name: 'Name1',
+    address: '1.1.1.3',
+    port: 1113,
+    ssrc: 4,
+  });
+  sinon.assert.calledWith(callback1, {
+    id: socket4.id,
+    name: 'Name4',
+    address: '1.1.1.6',
+    port: 1116,
+    ssrc: 5,
+  });
+  sinon.assert.calledWith(callback4, {
+    id: socket1.id,
+    name: 'Name1',
+    address: '1.1.1.5',
+    port: 1115,
+    ssrc: 6,
   });
 });
