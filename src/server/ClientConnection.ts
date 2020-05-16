@@ -1,17 +1,12 @@
 import { Socket } from 'socket.io';
 
+import * as constants from './constants';
 import * as rtpPortIdentifier from './rtpPortIdentifier';
 import Session, { Client } from './Session';
 import SessionManager from './SessionManager';
 
-const serverId = 'server';
-const serverAddress = 'rehearse20.sijben.dev';
-const identPort = 50051;
-
 class ClientConnection {
-  static id: string = serverId;
-  static address: string = serverAddress;
-  static identPort: number = identPort;
+  static serverId: string = 'server';
 
   client: Client;
   // session this client is connected to
@@ -42,7 +37,10 @@ class ClientConnection {
       console.log(`disconnected ${this.client.name}`);
       this.session.delete(this.client);
       this.session.forEach((c) => {
-        c.socket.emit('user left', { id: this.client.id, name: this.client.name });
+        c.socket.emit('user left', {
+          id: this.client.id,
+          name: this.client.name,
+        });
         c.socket.emit('stop sending', {
           id: this.client.id,
         });
@@ -74,25 +72,29 @@ class ClientConnection {
       if (other !== this.client) {
         const clientSsrc = this.session.getSsrc();
         this.client.socket.emit('start sending', {
-          id: serverId,
-          address: serverAddress,
-          port: identPort,
+          id: ClientConnection.serverId,
+          address: constants.IDENT_HOST,
+          port: constants.IDENT_PORT,
           ssrc: clientSsrc,
         });
         const otherSsrc = this.session.getSsrc();
         other.socket.emit('start sending', {
-          id: serverId,
-          address: serverAddress,
-          port: identPort,
+          id: ClientConnection.serverId,
+          address: constants.IDENT_HOST,
+          port: constants.IDENT_PORT,
           ssrc: otherSsrc,
         });
         const [clientHostPort, otherHostPort] = await Promise.all([
           rtpPortIdentifier.waitForIdentPackage(clientSsrc).then((result) => {
-            this.client.socket.emit('stop sending', { id: serverId });
+            this.client.socket.emit('stop sending', {
+              id: ClientConnection.serverId,
+            });
             return result;
           }),
           rtpPortIdentifier.waitForIdentPackage(otherSsrc).then((result) => {
-            other.socket.emit('stop sending', { id: serverId });
+            other.socket.emit('stop sending', {
+              id: ClientConnection.serverId,
+            });
             return result;
           }),
         ]);
