@@ -42,7 +42,7 @@ it('should create a new session when the first client identifies itself', () => 
   expect(clientConnection.session.size).toBe(1);
 });
 
-it('should create remember the client properties when a client identifies itself', () => {
+it('should remember the client properties when a client identifies itself', () => {
   const clientConnection = new ClientConnection(socket);
 
   socket.emit('identify', { name: 'Name', sessionId: 'Session' }, () => {});
@@ -82,6 +82,42 @@ it('should announce a new client to the current clients', () => {
     id: 'socket-id',
     name: 'Name2',
   });
+});
+
+it('should announce leaving clients to the other clients', () => {
+  const socket1 = identifyNewClient('socket-1', 'Name1', 'Session');
+  const socket2 = identifyNewClient('socket-2', 'Name2', 'Session');
+  const userLeft = sinon.stub();
+  socket2.on('user left', userLeft);
+  const stopSending = sinon.stub();
+  socket2.on('stop sending', stopSending);
+
+  socket1.emit('disconnect');
+
+  sinon.assert.calledWith(userLeft, { id: 'socket-1', name: 'Name1' });
+  sinon.assert.calledWith(stopSending, { id: 'socket-1' });
+});
+
+it('should remove a leaving client from the session', () => {
+  const socket1 = identifyNewClient('socket-1', 'Name1', 'Session');
+  const socket2 = identifyNewClient('socket-2', 'Name2', 'Session');
+  const session = SessionManager.initializeSession('Session');
+
+  socket1.emit('disconnect');
+
+  expect(session.size).toBe(1);
+  const ids = [...session.keys()].map(s => s.id);
+  expect(ids).toStrictEqual(['socket-2']);
+});
+
+it('should cleanup the session after the last client leaves', () => {
+  const socket1 = identifyNewClient('socket-1', 'Name1', 'Session');
+  const socket2 = identifyNewClient('socket-2', 'Name2', 'Session');
+
+  socket1.emit('disconnect');
+  socket2.emit('disconnect');
+
+  expect(SessionManager.sessions.size).toBe(0);
 });
 
 it('should allocate SSRCs when clients start streaming (to the server)', () => {

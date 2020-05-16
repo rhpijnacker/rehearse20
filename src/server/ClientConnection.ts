@@ -30,10 +30,26 @@ class ClientConnection {
 
   subscribeToSocket() {
     const socket = this.client.socket;
+    socket.on('disconnect', () => this.onDisconnected());
     socket.on('identify', (props, callback) =>
       this.onIdentify(props, callback)
     );
     socket.on('start streaming', () => this.onStartStreaming());
+  }
+
+  onDisconnected() {
+    if (this.client.name) {
+      console.log(`disconnected ${this.client.name}`);
+      this.session.delete(this.client);
+      this.session.forEach((c) => {
+        c.socket.emit('user left', { id: this.client.id, name: this.client.name });
+        c.socket.emit('stop sending', {
+          id: this.client.id,
+        });
+      });
+      console.log(`#${this.session.size} left`);
+      SessionManager.cleanupSession(this.client.sessionId);
+    }
   }
 
   onIdentify({ name, sessionId }, callback) {
