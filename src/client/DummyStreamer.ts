@@ -16,11 +16,11 @@ class DummyStreamer {
     child.on('close', (code) => {
       console.log(`trx exited with code ${code}`);
       this.streamers.delete(id);
-      console.log('streamers:', this.streamers.keys());
+      // console.log('streamers:', this.streamers.keys());
     });
 
     this.streamers.set(id, child);
-    console.log('streamers:', this.streamers.keys());
+    // console.log('streamers:', this.streamers.keys());
   }
 
   stopSending(id, address?) {

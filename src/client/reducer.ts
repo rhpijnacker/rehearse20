@@ -16,7 +16,7 @@ const members = (state = [], action) => {
 
 const trx = (state = {}, action) => {
   const current = state[action.id] || {};
-  console.log(current);
+  // console.log(current);
   switch (action.type) {
     case actions.START_RECVING:
       return {
