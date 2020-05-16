@@ -24,7 +24,7 @@
     "postinstall": "cd src/client && npm ci",
     "build": "tsc",
     "package": "electron-packager src/client --platform darwin,linux --out dist",
-    "gui": "electron src/client/main.js &",
+    "gui": "electron src/client/main.js 2> /dev/null &",
     "cli": "node src/client/cli.js",
     "server": "node src/server",
     "test": "jest",
