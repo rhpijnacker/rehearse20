@@ -1,8 +1,6 @@
 import { ChildProcess, spawn } from 'child_process';
 import * as path from 'path';
 
-import * as rtppacket from '../lib/rtppacket';
-
 class DummyStreamer {
   ticker: NodeJS.Timeout;
   streamers: Map<string, ChildProcess>;
@@ -39,18 +37,38 @@ class DummyStreamer {
   }
 
   trx(localPort, remoteAddress, remotePort, ssrc) {
-    console.log('node', [
-      path.join(__dirname, 'trx', 'dummy_trx.js'),
+    // console.log('node', [
+    //   path.join(__dirname, 'trx', 'dummy_trx.js'),
+    //   localPort,
+    //   remoteAddress,
+    //   remotePort,
+    //   ssrc,
+    // ]);
+    // const child = spawn('node', [
+    //   path.join(__dirname, 'trx', 'dummy_trx.js'),
+    //   localPort,
+    //   remoteAddress,
+    //   remotePort,
+    //   ssrc,
+    // ]);
+    console.log(path.join(__dirname, 'trx', 'trx'), [
+      '-p',
       localPort,
+      '-h',
       remoteAddress,
+      '-s',
       remotePort,
+      '-S',
       ssrc,
-    ]);
-    const child = spawn('node', [
-      path.join(__dirname, 'trx', 'dummy_trx.js'),
+    ].join(' '));
+    const child = spawn(path.join(__dirname, 'trx', 'trx'), [
+      '-p',
       localPort,
+      '-h',
       remoteAddress,
+      '-s',
       remotePort,
+      '-S',
       ssrc,
     ]);
     child.stdout.on('data', (data) => console.log(data.toString()));
