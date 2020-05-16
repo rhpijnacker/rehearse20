@@ -73,14 +73,14 @@ class ClientConnection {
         const clientSsrc = this.session.getSsrc();
         this.client.socket.emit('start sending', {
           id: ClientConnection.serverId,
-          address: constants.IDENT_HOST,
+          address: constants.SERVER_ADDRESS,
           port: constants.IDENT_PORT,
           ssrc: clientSsrc,
         });
         const otherSsrc = this.session.getSsrc();
         other.socket.emit('start sending', {
           id: ClientConnection.serverId,
-          address: constants.IDENT_HOST,
+          address: constants.SERVER_ADDRESS,
           port: constants.IDENT_PORT,
           ssrc: otherSsrc,
         });

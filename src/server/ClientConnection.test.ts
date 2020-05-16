@@ -142,14 +142,14 @@ it('should allocate SSRCs when clients start streaming (to the server)', () => {
   sinon.assert.calledOnce(callback1);
   sinon.assert.calledWith(callback1, {
     id: ClientConnection.serverId,
-    address: constants.IDENT_HOST,
+    address: constants.SERVER_ADDRESS,
     port: constants.IDENT_PORT,
     ssrc: 1234,
   });
   sinon.assert.calledOnce(callback2);
   sinon.assert.calledWith(callback2, {
     id: ClientConnection.serverId,
-    address: constants.IDENT_HOST,
+    address: constants.SERVER_ADDRESS,
     port: constants.IDENT_PORT,
     ssrc: 5678,
   });

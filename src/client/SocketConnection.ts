@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import io from 'socket.io-client';
 
+import * as serverConstants from '../server/constants';
 import DummyStreamer from './DummyStreamer';
 import TrxStreamer from './TrxStreamer';
 import * as actions from './actions';
 
-const SOCKET_SERVER = 'http://149.210.193.195:3000'; // rehearse20.sijben.dev
-// const SOCKET_SERVER = 'http://localhost:3000'; // Ronald lokaal
+const SOCKET_SERVER = `http://${serverConstants.SERVER_ADDRESS}:${serverConstants.HTTP_PORT}`;
 
 const urlParams = new URLSearchParams(window.location.search);
 const name = urlParams.get('name');
