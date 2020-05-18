@@ -34,12 +34,15 @@ const useStyles = makeStyles((theme) => ({
   submit: {},
 }));
 
+const urlParams = new URLSearchParams(window.location.search);
+console.log(urlParams.get('name'), urlParams.get('sessionId'));
+
 const Index = () => {
   const classes = useStyles();
 
-  const [name, setName] = useState('');
-  const [sessionId, setSessionId] = useState('');
-  const [isSubmitAllowed, setSubmitAllowed] = useState(false);
+  const [name, setName] = useState(urlParams.get('name') || '');
+  const [sessionId, setSessionId] = useState(urlParams.get('sessionId') || '');
+  const [isSubmitAllowed, setSubmitAllowed] = useState(!!name && !!sessionId);
 
   const onNameChange = (event) => {
     const value = event.target.value;
@@ -80,6 +83,7 @@ const Index = () => {
               label="Your name"
               id="name"
               name="name"
+              value={name}
               autoComplete="given-name"
               autoFocus
               onChange={onNameChange}
@@ -91,6 +95,7 @@ const Index = () => {
               label="Session ID"
               id="sessionId"
               name="sessionId"
+              value={sessionId}
               onChange={onSessionIdChange}
             />
             <Button

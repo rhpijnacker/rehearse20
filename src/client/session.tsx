@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 const urlParams = new URLSearchParams(window.location.search);
 const name = urlParams.get('name');
+const sessionId = urlParams.get('sessionId');
 
 const Session = () => {
   const classes = useStyles();
@@ -52,7 +53,7 @@ const Session = () => {
           </div>
           <MembersList></MembersList>
           <VolumeControl></VolumeControl>
-          <Link href="index.html">&lt; Leave session</Link>
+          <Link href={`index.html?name=${name}&sessionId=${sessionId}`}>&lt; Leave session</Link>
         </Container>
         <SocketConnection store={store} />
       </ThemeProvider>

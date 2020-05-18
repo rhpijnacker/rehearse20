@@ -1,5 +1,8 @@
 const { app, BrowserWindow } = require('electron');
 
+const userName = process.argv[2] || '';
+const sessionId = process.argv[3] || '';
+
 const createWindow = () => {
   const window = new BrowserWindow({
     width: 800,
@@ -9,7 +12,7 @@ const createWindow = () => {
       nodeIntegration: true,
     },
   });
-  window.loadFile('index.html');
+  window.loadURL(`file://${__dirname}/index.html?name=${userName}&sessionId=${sessionId}`);
   // window.webContents.openDevTools()
 };
 
