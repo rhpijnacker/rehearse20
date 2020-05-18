@@ -6,8 +6,6 @@ import ClientConnection from './ClientConnection';
 import * as constants from './constants';
 import * as rtpPortIdentifier from './rtpPortIdentifier';
 
-const serverId = 'server';
-
 // const app = express();
 const server = http.createServer();
 const io = socketio(server);

@@ -27,7 +27,6 @@ const MemberList = () => {
           ? 'Waiting for others to join...'
           : members.map((member) => {
               const trx = trxs[member.id];
-              console.log('member', member, 'trx', trx);
               return (
                 <MemberItem
                   key={member.id}

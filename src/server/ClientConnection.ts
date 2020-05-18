@@ -6,8 +6,6 @@ import Session, { Client } from './Session';
 import SessionManager from './SessionManager';
 
 class ClientConnection {
-  static serverId: string = 'server';
-
   client: Client;
   // session this client is connected to
   session: Session;
@@ -72,14 +70,14 @@ class ClientConnection {
       if (other !== this.client) {
         const clientSsrc = this.session.getSsrc();
         this.client.socket.emit('start sending', {
-          id: ClientConnection.serverId,
+          id: other.id,
           address: constants.SERVER_ADDRESS,
           port: constants.IDENT_PORT,
           ssrc: clientSsrc,
         });
         const otherSsrc = this.session.getSsrc();
         other.socket.emit('start sending', {
-          id: ClientConnection.serverId,
+          id: this.client.id,
           address: constants.SERVER_ADDRESS,
           port: constants.IDENT_PORT,
           ssrc: otherSsrc,
@@ -87,13 +85,13 @@ class ClientConnection {
         const [clientHostPort, otherHostPort] = await Promise.all([
           rtpPortIdentifier.waitForIdentPackage(clientSsrc).then((result) => {
             this.client.socket.emit('stop sending', {
-              id: ClientConnection.serverId,
+              id: other.id,
             });
             return result;
           }),
           rtpPortIdentifier.waitForIdentPackage(otherSsrc).then((result) => {
             other.socket.emit('stop sending', {
-              id: ClientConnection.serverId,
+              id: this.client.id,
             });
             return result;
           }),

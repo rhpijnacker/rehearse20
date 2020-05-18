@@ -141,14 +141,14 @@ it('should allocate SSRCs when clients start streaming (to the server)', () => {
   sinon.assert.calledTwice(getSSrcsStub);
   sinon.assert.calledOnce(callback1);
   sinon.assert.calledWith(callback1, {
-    id: ClientConnection.serverId,
+    id: 'socket-2',
     address: constants.SERVER_ADDRESS,
     port: constants.IDENT_PORT,
     ssrc: 1234,
   });
   sinon.assert.calledOnce(callback2);
   sinon.assert.calledWith(callback2, {
-    id: ClientConnection.serverId,
+    id: 'socket-1',
     address: constants.SERVER_ADDRESS,
     port: constants.IDENT_PORT,
     ssrc: 5678,
@@ -180,9 +180,9 @@ it('should obtain the external adress and port from clients streaming to the ser
 
   await oneCycle();
   sinon.assert.calledOnce(callback1);
-  sinon.assert.calledWith(callback1, { id: ClientConnection.serverId });
+  sinon.assert.calledWith(callback1, { id: 'socket-2' });
   sinon.assert.calledOnce(callback2);
-  sinon.assert.calledWith(callback2, { id: ClientConnection.serverId });
+  sinon.assert.calledWith(callback2, { id: 'socket-1' });
 });
 
 it('should streaming to all peers when the ports are known', async () => {

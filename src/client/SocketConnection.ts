@@ -13,7 +13,6 @@ const SOCKET_SERVER = `http://${serverConstants.SERVER_ADDRESS}:${serverConstant
 const urlParams = new URLSearchParams(window.location.search);
 const name = urlParams.get('name');
 const sessionId = urlParams.get('sessionId') || 'default';
-const startPort = 51352 + Math.floor(Math.random() * 1000);
 
 const getFreePort = async (): Promise<number> => {
   return new Promise(async (resolve) => {
@@ -107,7 +106,7 @@ const SocketConnection = (props) => {
     });
 
     socket.on('stop sending', ({ id, address }) => {
-      console.log(`stop sending to ${id} on ${address}`);
+      console.log(`stop sending to ${id}`);
       streamer.stopSending(id, address);
       dispatch(actions.stopSending(id));
     });
