@@ -4,12 +4,13 @@ import { applyMiddleware, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { createLogger } from 'redux-logger';
 
-import { Container, CssBaseline, Typography } from '@material-ui/core';
+import { Container, CssBaseline, Link, Typography } from '@material-ui/core';
 import {
   createMuiTheme,
   makeStyles,
   ThemeProvider,
 } from '@material-ui/core/styles';
+import * as color from '@material-ui/core/colors';
 
 import MembersList from './MembersList';
 import SocketConnection from './SocketConnection';
@@ -19,7 +20,9 @@ import reducer from './reducer';
 const logger = createLogger({ collapsed: true });
 const store = createStore(reducer, applyMiddleware(logger));
 
-const theme = createMuiTheme({ palette: { type: 'dark' } });
+const theme = createMuiTheme({
+  palette: { type: 'dark', primary: { main: color.lightBlue['300'] } },
+});
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -49,6 +52,7 @@ const Session = () => {
           </div>
           <MembersList></MembersList>
           <VolumeControl></VolumeControl>
+          <Link href="index.html">&lt; Leave session</Link>
         </Container>
         <SocketConnection store={store} />
       </ThemeProvider>

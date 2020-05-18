@@ -10,3 +10,9 @@
 
 - Manage the forked processes, e.g. crash-restart
 
++ Back to initial screen
+- UI for various trx options
+
+trx
+- use RTCP
+x replace threads with loop

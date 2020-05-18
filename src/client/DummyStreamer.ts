@@ -72,7 +72,7 @@ class DummyStreamer {
       ssrc,
     ]);
     child.stdout.on('data', (data) => console.log(data.toString()));
-    child.stderr.on('data', (data) => console.error(data));
+    child.stderr.on('data', (data) => console.error(data.toString()));
     return child;
   }
 }
