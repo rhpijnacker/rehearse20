@@ -15,29 +15,24 @@ const name = urlParams.get('name');
 const sessionId = urlParams.get('sessionId') || 'default';
 const startPort = 51352 + Math.floor(Math.random() * 1000);
 
-const isPortFree = async (port) => {
-  return new Promise((resolve) => {
+const getFreePort = async (): Promise<number> => {
+  return new Promise(async (resolve) => {
     const socket = dgram.createSocket('udp4');
-    socket.on('listening', () => {
+    socket.bind({ port: 0, exclusive: true }, () => {
+      const port = socket.address().port;
       socket.close();
-      resolve(true);
+      console.log('got port', port);
+      resolve(port);
     });
-    socket.on('error', () => {
-      socket.close();
-      resolve(false);
-    });
-    socket.bind({ port, exclusive: true });
   });
 };
 
-let nextFreePort = startPort;
-const getFreePort = async (): Promise<number> => {
+const getFreeEvenNumberedPort = async (): Promise<number> => {
   return new Promise(async (resolve) => {
     let port;
     do {
-      port = nextFreePort;
-      nextFreePort += 2; // RTP uses the +1 port too
-    } while (!(await isPortFree(port)));
+      port = await getFreePort();
+    } while (port % 2 !== 0);
     resolve(port);
   });
 };
@@ -104,7 +99,7 @@ const SocketConnection = (props) => {
       );
       let localPort = ports.get(ssrc);
       if (!localPort) {
-        localPort = await getFreePort();
+        localPort = await getFreeEvenNumberedPort();
         ports.set(ssrc, localPort);
       }
       streamer.startSending(id, localPort, address, port, ssrc);
