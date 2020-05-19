@@ -1,0 +1,6 @@
+#!/bin/sh
+
+git clean -dfx
+git pull
+npm ci
+npm run build
