@@ -58,6 +58,15 @@ const trx = (state = {}, action) => {
   }
 };
 
+const trxParameters = (state = '', action) => {
+  switch (action.type) {
+    case actions.SET_TRX_PARAMETERS:
+      return action.trxParameters;
+    default:
+      return state;
+  }
+};
+
 const volume = (state = { isMuted: false }, action) => {
   switch (action.type) {
     case actions.MUTE_MICROPHONE:
@@ -71,4 +80,4 @@ const volume = (state = { isMuted: false }, action) => {
   }
 };
 
-export default combineReducers({ members, trx, volume });
+export default combineReducers({ members, trx, trxParameters, volume });

@@ -14,6 +14,7 @@ import * as color from '@material-ui/core/colors';
 
 import MembersList from './MembersList';
 import SocketConnection from './SocketConnection';
+import TrxParams from './TrxParams';
 import VolumeControl from './VolumeControl';
 import reducer from './reducer';
 
@@ -53,6 +54,7 @@ const Session = () => {
           </div>
           <MembersList></MembersList>
           <VolumeControl></VolumeControl>
+          <TrxParams></TrxParams>
           <Link href={`index.html?name=${name}&sessionId=${sessionId}`}>&lt; Leave session</Link>
         </Container>
         <SocketConnection store={store} />

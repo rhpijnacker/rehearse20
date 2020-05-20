@@ -11,6 +11,8 @@ export const MUTE_MICROPHONE = 'MUTE_MICROPHONE';
 export const UNMUTE_MICROPHONE = 'UNMUTE_MICROPHONE';
 export const TOGGLE_MICROPHONE = 'TOGGLE_MICROPHONE';
 
+export const SET_TRX_PARAMETERS = 'SET_TRX_PARAMETERS';
+
 export const addMember = (member) => ({
   type: ADD_MEMBER,
   member,
@@ -43,3 +45,8 @@ export const stopRecving = (id) => ({ type: STOP_RECVING, id });
 export const muteMicrophone = () => ({ type: MUTE_MICROPHONE });
 export const unmuteMicrophone = () => ({ type: UNMUTE_MICROPHONE });
 export const toggleMicrophone = () => ({ type: TOGGLE_MICROPHONE });
+
+export const setTrxParameters = (trxParameters: string) => ({
+  type: SET_TRX_PARAMETERS,
+  trxParameters,
+});

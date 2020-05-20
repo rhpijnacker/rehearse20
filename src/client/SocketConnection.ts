@@ -1,12 +1,13 @@
 import * as dgram from 'dgram';
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import io from 'socket.io-client';
 
 import * as serverConstants from '../server/constants';
 import DummyStreamer from './DummyStreamer';
 import TrxStreamer from './TrxStreamer';
 import * as actions from './actions';
+import observeStore from './observeStore';
 
 const SOCKET_SERVER = `http://${serverConstants.SERVER_ADDRESS}:${serverConstants.HTTP_PORT}`;
 
@@ -41,7 +42,17 @@ const ports = new Map<number, number>();
 const SocketConnection = (props) => {
   const dispatch = useDispatch();
   const volume = useSelector((state) => state.volume);
+  const trxParameters = useSelector((state) => state.trxParameters);
   const [socket, setSocket] = useState(null);
+  const [streamer, setStreamer] = useState(null);
+  const store = useStore();
+
+  const onTrxParametersChange = (newParameters, streamer) => {
+    if (streamer) {
+      console.log(`restarting with "${newParameters}"`);
+      streamer.restart(newParameters);
+    }
+  };
 
   useEffect(() => {
     const socket = subscribeToSocket();
@@ -58,6 +69,15 @@ const SocketConnection = (props) => {
   }, []);
 
   useEffect(() => {
+    const unsubscribe = observeStore(
+      store,
+      (state) => state.trxParameters,
+      (newState) => onTrxParametersChange(newState, streamer)
+    );
+    return () => unsubscribe();
+  }, [streamer]);
+
+  useEffect(() => {
     if (socket) {
       socket.emit('mute microphone', { isMuted: volume.isMuted });
     }
@@ -66,6 +86,7 @@ const SocketConnection = (props) => {
   const subscribeToSocket = () => {
     const socket = io(SOCKET_SERVER, { transports: ['websocket'] });
     const streamer = new DummyStreamer();
+    setStreamer(streamer);
 
     socket.on('connect', async () => {
       console.log('connected');
