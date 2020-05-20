@@ -15,6 +15,7 @@ import {
   ThemeProvider,
 } from '@material-ui/core/styles';
 import * as color from '@material-ui/core/colors';
+import { Autocomplete } from '@material-ui/lab';
 
 import * as storage from './persistentStorage';
 
@@ -45,6 +46,7 @@ const Index = () => {
   const [sessionId, setSessionId] = useState(
     urlParams.get('sessionId') || storage.getSession()
   );
+  const [sessionIdInput, setSessionIdInput] = useState(sessionId);
   const [isSubmitAllowed, setSubmitAllowed] = useState(!!name && !!sessionId);
 
   const onNameChange = (event) => {
@@ -53,10 +55,16 @@ const Index = () => {
     setSubmitAllowed(!!value && !!sessionId);
   };
 
-  const onSessionIdChange = (event) => {
-    const value = event.target.value;
+  const onSessionIdChange = (event, value) => {
     setSessionId(value);
     setSubmitAllowed(!!value && !!name);
+  };
+  const onSessionIdInputChange = (event, value) => {
+    setSessionIdInput(value);
+    setSubmitAllowed(!!value && !!name);
+  };
+  const onSessionIdBlur = (event) => {
+    setSessionId(sessionIdInput);
   };
 
   const onSubmit = (event) => {
@@ -68,7 +76,7 @@ const Index = () => {
 
   const navigateToSession = () => {
     if (name) {
-      location.href = `session.html`;
+      location.href = 'session.html';
     }
   };
 
@@ -89,19 +97,32 @@ const Index = () => {
               id="name"
               name="name"
               value={name}
+              onChange={onNameChange}
               autoComplete="given-name"
               autoFocus
-              onChange={onNameChange}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Session ID"
-              id="sessionId"
-              name="sessionId"
+            <Autocomplete
+              options={storage.getSessions()}
+              onBlur={onSessionIdBlur}
               value={sessionId}
               onChange={onSessionIdChange}
+              inputValue={sessionIdInput}
+              onInputChange={onSessionIdInputChange}
+              fullWidth
+              openOnFocus
+              selectOnFocus
+              freeSolo
+              handleHomeEndKeys
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  margin="normal"
+                  required
+                  label="Session ID"
+                  id="sessionId"
+                  name="sessionId"
+                />
+              )}
             />
             <Button
               disabled={!isSubmitAllowed}

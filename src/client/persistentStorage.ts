@@ -19,6 +19,9 @@ export function getSession() {
 
 export function addSession(sessionId) {
   let sessions = getSessions();
-  sessions = [sessionId, ...sessions.filter(s => s !== sessionId)];
+  sessions = [sessionId, ...sessions.filter((s) => s !== sessionId)].slice(
+    0,
+    5
+  );
   localStorage.setItem('sessions', JSON.stringify(sessions));
 }
