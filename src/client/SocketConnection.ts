@@ -122,7 +122,8 @@ const SocketConnection = (props) => {
         localPort = await getFreeEvenNumberedPort();
         ports.set(ssrc, localPort);
       }
-      streamer.startSending(id, localPort, address, port, ssrc);
+      const trxParameters = store.getState().trxParameters;
+      streamer.startSending(id, localPort, address, port, ssrc, trxParameters);
       dispatch(actions.startSending(id, address, port));
     });
 
