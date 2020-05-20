@@ -1,7 +1,7 @@
 {
   "name": "rehearse20",
   "version": "0.0.1",
-  "description": "Rehease online 2.0",
+  "description": "Rehease online 20",
   "dependencies": {
     "socket.io": "^2.3.0"
   },

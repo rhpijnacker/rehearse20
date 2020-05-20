@@ -46,7 +46,7 @@ const Session = () => {
           <div className={classes.paper}>
             <CssBaseline />
             <Typography component="h1" variant="h5">
-              Rehearse 2.0
+              Rehearse 20
             </Typography>
             <div className={classes.greeting}>Hi {name}</div>
             We are in session!
