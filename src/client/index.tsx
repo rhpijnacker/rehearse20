@@ -16,6 +16,8 @@ import {
 } from '@material-ui/core/styles';
 import * as color from '@material-ui/core/colors';
 
+import * as storage from './persistentStorage';
+
 const theme = createMuiTheme({
   palette: { type: 'dark', primary: { main: color.lightBlue['300'] } },
 });
@@ -35,13 +37,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const urlParams = new URLSearchParams(window.location.search);
-console.log(urlParams.get('name'), urlParams.get('sessionId'));
 
 const Index = () => {
   const classes = useStyles();
 
-  const [name, setName] = useState(urlParams.get('name') || '');
-  const [sessionId, setSessionId] = useState(urlParams.get('sessionId') || '');
+  const [name, setName] = useState(urlParams.get('name') || storage.getName());
+  const [sessionId, setSessionId] = useState(
+    urlParams.get('sessionId') || storage.getSession()
+  );
   const [isSubmitAllowed, setSubmitAllowed] = useState(!!name && !!sessionId);
 
   const onNameChange = (event) => {
@@ -58,12 +61,14 @@ const Index = () => {
 
   const onSubmit = (event) => {
     event.preventDefault();
+    storage.setName(name);
+    storage.addSession(sessionId);
     navigateToSession();
   };
 
   const navigateToSession = () => {
     if (name) {
-      location.href = `session.html?name=${name}&sessionId=${sessionId}`;
+      location.href = `session.html`;
     }
   };
 

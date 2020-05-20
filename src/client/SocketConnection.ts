@@ -8,12 +8,12 @@ import DummyStreamer from './DummyStreamer';
 import TrxStreamer from './TrxStreamer';
 import * as actions from './actions';
 import observeStore from './observeStore';
+import * as storage from './persistentStorage';
 
 const SOCKET_SERVER = `http://${serverConstants.SERVER_ADDRESS}:${serverConstants.HTTP_PORT}`;
 
-const urlParams = new URLSearchParams(window.location.search);
-const name = urlParams.get('name');
-const sessionId = urlParams.get('sessionId') || 'default';
+const name = storage.getName();
+const sessionId = storage.getSession();
 
 const getFreePort = async (): Promise<number> => {
   return new Promise(async (resolve) => {

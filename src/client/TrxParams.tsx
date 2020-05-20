@@ -15,7 +15,6 @@ const Settings = () => {
   };
 
   const onKeyUp = (event) => {
-    const value = event.target.value;
     if (event.keyCode === 13) {
       onApply();
       event.target.blur();

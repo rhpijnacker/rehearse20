@@ -17,6 +17,7 @@ import SocketConnection from './SocketConnection';
 import TrxParams from './TrxParams';
 import VolumeControl from './VolumeControl';
 import reducer from './reducer';
+import * as storage from './persistentStorage';
 
 const logger = createLogger({ collapsed: true });
 const store = createStore(reducer, applyMiddleware(logger));
@@ -34,9 +35,7 @@ const useStyles = makeStyles((theme) => ({
   greeting: {},
 }));
 
-const urlParams = new URLSearchParams(window.location.search);
-const name = urlParams.get('name');
-const sessionId = urlParams.get('sessionId');
+const name = storage.getName();
 
 const Session = () => {
   const classes = useStyles();
@@ -55,7 +54,9 @@ const Session = () => {
           <MembersList></MembersList>
           <VolumeControl></VolumeControl>
           <TrxParams></TrxParams>
-          <Link href={`index.html?name=${name}&sessionId=${sessionId}`}>&lt; Leave session</Link>
+          <Link href="index.html">
+            &lt; Leave session
+          </Link>
         </Container>
         <SocketConnection store={store} />
       </ThemeProvider>
