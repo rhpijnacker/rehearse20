@@ -24,10 +24,13 @@ const AudioLatencyExplanation = (props) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            To start the audio latency test, plugin a headset in the audio
-            output and keep it (really) close the the microphone. A number of
-            audio pulses will be played, that will be recorded by the microphone
-            to measure the latency.
+            Connect an audio cable from the line-out to the line-in.
+            <br />
+            Or, plug a headset in the line-out and keep it (really) close the
+            the microphone.
+            <br />
+            <br />A number of audio pulses will be played, which will be
+            recorded by the microphone to measure the latency.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
