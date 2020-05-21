@@ -13,7 +13,7 @@ const createWindow = () => {
     },
   });
   window.loadURL(`file://${__dirname}/index.html?name=${userName}&sessionId=${sessionId}`);
-  // window.webContents.openDevTools()
+  window.webContents.openDevTools()
 };
 
 app.whenReady().then(createWindow);

@@ -17,6 +17,7 @@ import {
 import * as color from '@material-ui/core/colors';
 
 import PingChecker from './PingChecker';
+import AudioLatencyChecker from './AudioLatencyChecker';
 
 const theme = createMuiTheme({
   palette: { type: 'dark', primary: { main: color.lightBlue['300'] } },
@@ -44,6 +45,7 @@ const Settings = () => {
       <Container maxWidth="xl">
         <CssBaseline />
         <PingChecker />
+        <AudioLatencyChecker />
         <Link href="index.html">&lt; Back</Link>
       </Container>
     </ThemeProvider>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import { Button, withStyles } from '@material-ui/core';
 
 import ping from './ping';
 
@@ -12,7 +11,7 @@ const styles = {
     marginLeft: '5px',
   },
   latencyGood: {
-    color: 'green',
+    color: 'lightgreen',
   },
   latencyOk: {},
   latencyBad: {
@@ -43,7 +42,9 @@ const PingChecker = ({ classes }) => {
     <div>
       Check network latency:
       <div>
-        <Button onClick={startPing}>Start</Button>
+        <Button variant="contained" size="small" onClick={startPing}>
+          Start
+        </Button>
         <span className={classes.message}>
           {isPinging ? 'Measuring ...' : ''}
           <span className={pingClass(averagePing)}>
