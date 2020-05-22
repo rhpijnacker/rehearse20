@@ -36,6 +36,7 @@ const Settings = () => {
         label="Trx parameters"
         id="trx-params"
         variant="outlined"
+        size="small"
         name="trx-params"
         value={trxParams}
         onChange={onChange}
