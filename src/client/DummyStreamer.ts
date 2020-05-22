@@ -4,6 +4,7 @@ import * as dgram from 'dgram';
 
 interface StreamerData {
   child: ChildProcess;
+  timer: NodeJS.Timeout;
   localPort: number;
   remoteAddress: number;
   remotePort: number;
@@ -24,8 +25,10 @@ class DummyStreamer {
       console.log(`trx exited with code ${code}`);
       // console.log('streamers:', this.streamers.keys());
     });
+    const timer = setInterval(() => child.kill('SIGUSR1'), 5000);
     this.streamers.set(id, {
       child,
+      timer,
       localPort,
       remoteAddress,
       remotePort,
@@ -37,8 +40,13 @@ class DummyStreamer {
   stopSending(id, address?) {
     const streamer = this.streamers.get(id);
     this.streamers.delete(id);
-    if (streamer && streamer.child) {
-      streamer.child.kill();
+    if (streamer) {
+      if (streamer.child) {
+        streamer.child.kill();
+      }
+      if (streamer.timer) {
+        clearTimeout(streamer.timer);
+      }
     } else {
       console.log('??? No trx child?');
     }
