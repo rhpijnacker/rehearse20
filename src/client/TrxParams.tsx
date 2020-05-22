@@ -7,11 +7,13 @@ import * as actions from './actions';
 
 const Settings = () => {
   const [trxParams, setTrxParams] = useState('');
+  const [isApplyEnabled, setApplyEnabled] = useState(false);
   const dispatch = useDispatch();
 
   const onChange = (event) => {
     const value = event.target.value;
     setTrxParams(value);
+    setApplyEnabled(true);
   };
 
   const onKeyUp = (event) => {
@@ -22,6 +24,7 @@ const Settings = () => {
   };
 
   const onApply = () => {
+    setApplyEnabled(false);
     dispatch(actions.setTrxParameters(trxParams));
   };
 
@@ -38,7 +41,12 @@ const Settings = () => {
         onChange={onChange}
         onKeyUp={onKeyUp}
       />
-      <Button type="button" fullWidth onClick={onApply}>
+      <Button
+        type="button"
+        fullWidth
+        disabled={!isApplyEnabled}
+        onClick={onApply}
+      >
         Apply
       </Button>
     </div>
