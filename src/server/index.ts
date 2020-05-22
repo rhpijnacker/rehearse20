@@ -19,14 +19,15 @@ server.listen(constants.HTTP_PORT, () => {
 
 rtpPortIdentifier.bind(constants.IDENT_PORT);
 
-app.use(bodyParser.raw());
+app.use(bodyParser.raw({ type: 'application/octet-stream' }));
+app.use(bodyParser.text({ type: ['application/json', 'plain/text'] }));
 app.post('/save/:filename', (req, res) => {
   const remoteAddress = req.connection.remoteAddress;
   const filename = req.params.filename;
   const path = resolve('.', 'saved', remoteAddress, filename);
   fs.mkdirSync(dirname(path), { recursive: true });
   fs.writeFile(path, req.body, (err) => {
-    console.log({ path, err });
+    // console.log({ path, err, body: req.body });
     if (err) {
       res.statusCode = 404;
     }
