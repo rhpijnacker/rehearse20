@@ -3,8 +3,6 @@ import * as path from 'path';
 import * as dgram from 'dgram';
 
 interface StreamerData {
-  child: ChildProcess;
-  timer: NodeJS.Timeout;
   localPort: number;
   remoteAddress: number;
   remotePort: number;
@@ -12,50 +10,83 @@ interface StreamerData {
 }
 
 class MediaStreamer {
-  ticker: NodeJS.Timeout;
   streamers: Map<string, StreamerData>;
+  child: ChildProcess;
+  timer: NodeJS.Timeout;
+  extra: string;
 
   constructor() {
     this.streamers = new Map();
   }
 
   startSending(id, localPort, remoteAddress, remotePort, ssrc, extra = '') {
-    const child = this.trx(localPort, remoteAddress, remotePort, ssrc, extra);
-    child.on('close', (code) => {
-      console.log(`trx exited with code ${code}`);
-      // console.log('streamers:', this.streamers.keys());
-    });
-    const timer = setInterval(() => child.kill('SIGUSR1'), 5000);
     this.streamers.set(id, {
-      child,
-      timer,
       localPort,
       remoteAddress,
       remotePort,
       ssrc,
     });
-    // console.log('streamers:', this.streamers.keys());
+    this.restartTrx(extra);
   }
 
   stopSending(id, address?) {
-    const streamer = this.streamers.get(id);
-    this.streamers.delete(id);
-    if (streamer) {
-      if (streamer.child) {
-        streamer.child.kill();
-      }
-      if (streamer.timer) {
-        clearTimeout(streamer.timer);
-      }
-    } else {
-      console.log('??? No trx child?');
+    const wasPresent = this.streamers.delete(id);
+    if (wasPresent) {
+      this.restartTrx(this.extra);
     }
   }
 
   stop() {
-    this.streamers.forEach((streamer, id) => {
-      this.stopSending(id);
-    });
+    this.stopTrx();
+  }
+
+  restartTrx(extraParams) {
+    this.stopTrx();
+    this.extra = extraParams;
+    this.startTrx();
+  }
+
+  startTrx() {
+    this.child = this.trx();
+    if (this.child) {
+      this.child.on('close', (code) => {
+        console.log(`trx exited with code ${code}`);
+      });
+      this.timer = setInterval(() => this.child.kill('SIGUSR1'), 5000);
+    }
+  }
+
+  stopTrx() {
+    if (this.child) {
+      this.child.kill();
+      this.child = null;
+    } else {
+      console.log('??? No trx child?');
+    }
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+  }
+
+  trx() {
+    let clientStrings = [...this.streamers.entries()].map(
+      ([id, streamer]) =>
+        `${streamer.ssrc}@${streamer.localPort}!${streamer.remoteAddress}:${streamer.remotePort}`
+    );
+    console.log(path.join(__dirname, 'trx', 'trx'), [
+      '-x',
+      clientStrings.join(','),
+      ...this.extra.split(' '),
+    ]);
+    const child = spawn(path.join(__dirname, 'trx', 'trx'), [
+      '-X',
+      clientStrings.join(','),
+      ...this.extra.split(' '),
+    ]);
+    child.stdout.on('data', (data) => console.log(data.toString()));
+    child.stderr.on('data', (data) => console.error(data.toString()));
+    return child;
   }
 
   restart(extraParams: string) {
@@ -71,51 +102,6 @@ class MediaStreamer {
         extraParams
       );
     });
-  }
-
-  trx(localPort, remoteAddress, remotePort, ssrc, extra) {
-    // console.log('node', [
-    //   path.join(__dirname, 'trx', 'dummy_trx.js'),
-    //   localPort,
-    //   remoteAddress,
-    //   remotePort,
-    //   ssrc,
-    // ]);
-    // const child = spawn('node', [
-    //   path.join(__dirname, 'trx', 'dummy_trx.js'),
-    //   localPort,
-    //   remoteAddress,
-    //   remotePort,
-    //   ssrc,
-    // ]);
-    console.log(
-      path.join(__dirname, 'trx', 'trx'),
-      [
-        '-p',
-        localPort,
-        '-h',
-        remoteAddress,
-        '-s',
-        remotePort,
-        '-S',
-        ssrc,
-        ...extra.split(' '),
-      ].join(' ')
-    );
-    const child = spawn(path.join(__dirname, 'trx', 'trx'), [
-      '-p',
-      localPort,
-      '-h',
-      remoteAddress,
-      '-s',
-      remotePort,
-      '-S',
-      ssrc,
-      ...extra.split(' '),
-    ]);
-    child.stdout.on('data', (data) => console.log(data.toString()));
-    child.stderr.on('data', (data) => console.error(data.toString()));
-    return child;
   }
 }
 
