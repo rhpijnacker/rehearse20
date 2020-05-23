@@ -11,7 +11,7 @@ interface StreamerData {
   ssrc: Number;
 }
 
-class DummyStreamer {
+class MediaStreamer {
   ticker: NodeJS.Timeout;
   streamers: Map<string, StreamerData>;
 
@@ -119,4 +119,4 @@ class DummyStreamer {
   }
 }
 
-export default DummyStreamer;
+export default MediaStreamer;

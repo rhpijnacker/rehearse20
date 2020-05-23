@@ -4,8 +4,7 @@ import { useDispatch, useSelector, useStore } from 'react-redux';
 import io from 'socket.io-client';
 
 import * as serverConstants from '../server/constants';
-import DummyStreamer from './DummyStreamer';
-import TrxStreamer from './TrxStreamer';
+import MediaStreamer from './MediaStreamer';
 import * as actions from './actions';
 import observeStore from './observeStore';
 import * as storage from './persistentStorage';
@@ -85,7 +84,7 @@ const SocketConnection = (props) => {
 
   const subscribeToSocket = () => {
     const socket = io(SOCKET_SERVER, { transports: ['websocket'] });
-    const streamer = new DummyStreamer();
+    const streamer = new MediaStreamer();
     setStreamer(streamer);
 
     socket.on('connect', async () => {
