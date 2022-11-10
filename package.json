@@ -13,7 +13,7 @@
     "@types/sinon": "^9.0.1",
     "@types/socket.io": "^2.1.4",
     "body-parser": "^1.19.0",
-    "electron": "^8.2.5",
+    "electron": "^18.3.7",
     "electron-packager": "^14.2.1",
     "express": "^4.17.1",
     "jest": "^25.5.4",
