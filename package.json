@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Rehease online 20",
   "dependencies": {
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.5.0"
   },
   "devDependencies": {
     "@types/electron": "^1.6.10",
